@@ -8,7 +8,9 @@ import * as path from "path";
  *  2. MiniAMM Factory + Router
  *  3. Two USDC/POT pools with different fees (30 bps and 10 bps) and different
  *     reserve ratios, so the aggregator has two real venues to compare
- *  4. Seeds liquidity and writes addresses into web/lib/engine/deployments.json
+ *  4. PortalXBridge with the deployer as testnet relayer, funded with
+ *     destination-side liquidity
+ *  5. Writes addresses + tx hashes into web/lib/engine/deployments.json
  *
  * Usage: npx hardhat run scripts/deploy.ts --network portaldot
  */
@@ -61,6 +63,7 @@ async function main() {
     const addTx = await router.addLiquidity(
       await usdc.getAddress(),
       await pot.getAddress(),
+      p.feeBps,
       p.usdcLiq,
       p.potLiq,
       0,
@@ -73,7 +76,22 @@ async function main() {
     console.log(`Pool fee ${p.feeBps}bps: ${pairAddr}`);
   }
 
-  // 4. Persist for the quote engine
+  // 4. Bridge (testnet relayer = deployer unless RELAYER_ADDRESS is set)
+  const relayerAddress = process.env.RELAYER_ADDRESS || deployer.address;
+  const Bridge = await ethers.getContractFactory("PortalXBridge");
+  const bridge = await Bridge.deploy(relayerAddress);
+  await bridge.waitForDeployment();
+  txHashes.bridgeDeploy = bridge.deploymentTransaction()!.hash;
+
+  await (await bridge.setSupportedToken(await usdc.getAddress(), true)).wait();
+  await (await bridge.setSupportedToken(await pot.getAddress(), true)).wait();
+
+  // destination-side liquidity so releases succeed immediately
+  await (await usdc.mint(await bridge.getAddress(), ethers.parseEther("500000"))).wait();
+  await (await pot.mint(await bridge.getAddress(), ethers.parseEther("6250000"))).wait();
+  console.log(`Bridge: ${await bridge.getAddress()} (relayer ${relayerAddress})`);
+
+  // 5. Persist for the quote engine + frontend execution
   const deploymentsPath = path.join(__dirname, "..", "..", "web", "lib", "engine", "deployments.json");
   let deployments: Record<string, any> = {};
   try {
@@ -86,6 +104,8 @@ async function main() {
     deployedAt: new Date().toISOString(),
     factory: await factory.getAddress(),
     router: await router.getAddress(),
+    bridge: await bridge.getAddress(),
+    relayer: relayerAddress,
     tokens: { mUSDC: await usdc.getAddress(), mPOT: await pot.getAddress() },
     pairs: pairAddresses,
     txHashes,
