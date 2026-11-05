@@ -40,6 +40,8 @@ export interface Deployment {
   deployedAt: string;
   factory: Address;
   router: Address;
+  bridge: Address;
+  relayer: Address;
   tokens: Record<string, Address>;
   pairs: Record<string, Address>;
   txHashes: Record<string, string>;
