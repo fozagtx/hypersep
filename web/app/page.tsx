@@ -62,14 +62,14 @@ export default function Home() {
     const chainTokens = deployments[fromChain]?.tokens;
     const tokenAddr = chainTokens?.[fromToken] as Address | undefined;
     if (!tokenAddr) {
-      setFaucetState("Token not deployed yet — run the deploy script first.");
+      setFaucetState("Token not deployed yet - run the deploy script first.");
       return;
     }
     setFaucetState("Confirm in your wallet…");
     try {
       const action = buildFaucetAction(tokenAddr, fromToken, address);
       const hash = await sendWalletTx(action, Number(fromChain), address);
-      setFaucetState(`✓ Minted 1,000 ${fromToken} — tx ${hash.slice(0, 10)}…`);
+      setFaucetState(`✓ Minted 1,000 ${fromToken} - tx ${hash.slice(0, 10)}…`);
     } catch (e) {
       setFaucetState(`⚠ ${e instanceof Error ? e.message : "Faucet failed"}`);
     }
@@ -94,13 +94,13 @@ export default function Home() {
           Portaldot Hacker House · Multi-Chain &amp; Cross-Chain Infra
         </span>
         <h1>
-          Best price, across chains.
+          Trade across chains
           <br />
-          <span className="dim">One route. One signature set.</span>
+          <span className="dim">at the best route.</span>
         </h1>
         <p className="subtitle">
-          PortalX aggregates liquidity venues across Portaldot V3 and external EVM chains, ranks every
-          route by real cost — fees, gas, price impact, settlement time — and executes the winner.
+          Compare every venue on Portaldot and EVM chains. Ranked by total cost: fees, gas,
+          price impact, and settlement time.
         </p>
       </div>
 
@@ -192,7 +192,7 @@ export default function Home() {
 
       {!quote && !error && (
         <div className="empty">
-          Enter an amount and hit Compare routes — the aggregator ranks every venue and bridge path.
+          Enter an amount and press Compare routes. Every venue and bridge path gets ranked.
         </div>
       )}
 

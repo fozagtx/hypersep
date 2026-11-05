@@ -16,7 +16,7 @@ const plexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "PortalX — Cross-Chain Liquidity Aggregator",
+  title: "PortalX - Cross-Chain Liquidity Aggregator",
   description:
     "Discover, compare, and execute the best swap routes across Portaldot V3 and external EVM chains.",
 };

@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
   const relayerKey = process.env.RELAYER_PRIVATE_KEY as Hex | undefined;
   if (!relayerKey) {
     return NextResponse.json(
-      { error: "Relayer not configured — set RELAYER_PRIVATE_KEY in web/.env.local" },
+      { error: "Relayer not configured - set RELAYER_PRIVATE_KEY in web/.env.local" },
       { status: 503 }
     );
   }

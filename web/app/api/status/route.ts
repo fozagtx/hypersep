@@ -4,7 +4,7 @@ import { CHAINS } from "@/lib/engine/registry";
 
 export const dynamic = "force-dynamic";
 
-/** GET /api/status?chainId=420420777&txHash=0x... — settlement monitor */
+/** GET /api/status?chainId=420420777&txHash=0x... - settlement monitor */
 export async function GET(req: NextRequest) {
   const chainId = Number(req.nextUrl.searchParams.get("chainId"));
   const txHash = req.nextUrl.searchParams.get("txHash") ?? "";

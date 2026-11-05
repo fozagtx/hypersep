@@ -9,10 +9,10 @@
   --text: #f2f4f8;
   --muted: #8b93a3;
   --faint: #565e6e;
-  --accent: #6e8cff;
-  --accent-soft: rgba(110, 140, 255, 0.14);
-  --success: #34d399;
-  --success-soft: rgba(52, 211, 153, 0.12);
+  --accent: #00e64f;
+  --accent-soft: rgba(0, 230, 79, 0.12);
+  --success: #00e64f;
+  --success-soft: rgba(0, 230, 79, 0.1);
   --danger: #f87171;
   --warn: #fbbf24;
   --chain-a: #8b8bff;
@@ -327,11 +327,11 @@ button:disabled {
 
 .btn-accent {
   background: var(--accent);
-  color: #fff;
+  color: #04120a;
 }
 
 .btn-accent:hover:not(:disabled) {
-  background: #7f9aff;
+  background: #3dff70;
 }
 
 .btn-row {
