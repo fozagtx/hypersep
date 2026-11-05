@@ -86,7 +86,7 @@ export default function Home() {
         <div className="navbar-links">
           <a href="#swap">Swap</a>
           <a href="#highlights">Venues</a>
-          <a href="#api">Aggregator API</a>
+          <a href="/docs">Aggregator API</a>
           <a href="#faq">FAQs</a>
         </div>
         <ConnectButton />
