@@ -22,10 +22,18 @@ interface Props {
 
 const STATUS_LABEL: Record<ActionStatus, string> = {
   pending: "Queued",
-  signing: "Waiting for signature…",
-  confirming: "Confirming…",
+  signing: "Awaiting signature",
+  confirming: "Confirming",
   confirmed: "Confirmed",
   error: "Failed",
+};
+
+const STATUS_CLASS: Record<ActionStatus, string> = {
+  pending: "status-idle",
+  signing: "status-active",
+  confirming: "status-active",
+  confirmed: "status-confirmed",
+  error: "status-error",
 };
 
 export function ExecutionPanel({ route, deployments, userAddress }: Props) {
@@ -78,7 +86,6 @@ export function ExecutionPanel({ route, deployments, userAddress }: Props) {
       setFinished(true);
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Execution failed";
-      // mark the first non-confirmed action as failed
       setStates((prev) => {
         const next = { ...prev };
         for (const a of actions) {
@@ -95,59 +102,49 @@ export function ExecutionPanel({ route, deployments, userAddress }: Props) {
   }
 
   return (
-    <div className="card">
-      <h2>Execute route</h2>
-      <p className="subtitle" style={{ margin: "0 0 14px" }}>
-        {actions.length} on-chain transactions. Your wallet will ask you to sign each one and switch
-        networks when the route crosses chains.
-      </p>
+    <div className="panel">
+      <div className="panel-head">
+        <h2>Execute route</h2>
+        <span className="tag">{actions.length} on-chain transactions</span>
+      </div>
 
-      {actions.map((action, i) => {
-        const s = states[action.id] ?? { status: "pending" as ActionStatus };
-        return (
-          <div className="step" key={action.id} style={{ justifyContent: "space-between", padding: "8px 0" }}>
-            <span>
-              <strong>{i + 1}.</strong> {action.label}
-              {action.type === "bridge-release" && (
-                <span className="venue" style={{ marginLeft: 8 }}>relayer-executed</span>
-              )}
-            </span>
-            <span
-              style={{
-                fontSize: 12,
-                color:
-                  s.status === "confirmed"
-                    ? "var(--accent-2)"
-                    : s.status === "error"
-                      ? "#ef4444"
-                      : "var(--muted)",
-              }}
-            >
-              {STATUS_LABEL[s.status]}
-              {s.txHash && (
-                <a
-                  href={explorerTxUrl(action.chainId, s.txHash)}
-                  target="_blank"
-                  rel="noreferrer"
-                  style={{ marginLeft: 8, color: "var(--accent)" }}
-                >
-                  {s.txHash.slice(0, 10)}…
-                </a>
-              )}
-            </span>
-            {s.error && <p className="warning" style={{ width: "100%" }}>⚠ {s.error}</p>}
-          </div>
-        );
-      })}
+      <div className="timeline">
+        {actions.map((action, i) => {
+          const s = states[action.id] ?? { status: "pending" as ActionStatus };
+          const cls =
+            s.status === "confirmed" ? "confirmed" : s.status === "error" ? "error" : s.status === "pending" ? "" : "active";
+          return (
+            <div className={`tl-item ${cls}`} key={action.id}>
+              <div className="tl-dot" />
+              <div className="tl-body">
+                <div className="tl-title">
+                  <span className="step-n">{String(i + 1).padStart(2, "0")}</span>
+                  {action.label}
+                </div>
+                <div className="tl-meta">
+                  {action.type === "bridge-release" && <span>relayer-executed</span>}
+                  <span className={STATUS_CLASS[s.status]}>{STATUS_LABEL[s.status]}</span>
+                  {s.txHash && (
+                    <a href={explorerTxUrl(action.chainId, s.txHash)} target="_blank" rel="noreferrer">
+                      {s.txHash.slice(0, 10)}… ↗
+                    </a>
+                  )}
+                </div>
+                {s.error && <div className="tl-error">⚠ {s.error}</div>}
+              </div>
+            </div>
+          );
+        })}
+      </div>
 
-      <div style={{ marginTop: 16 }}>
-        <button onClick={runAll} disabled={running}>
+      <div className="btn-row">
+        <button className="btn-accent" onClick={runAll} disabled={running}>
           {running ? "Executing…" : finished ? "Execute again" : "Execute route"}
         </button>
       </div>
 
       {finished && (
-        <p style={{ color: "var(--accent-2)", marginTop: 12, fontSize: 14 }}>
+        <p className="footer-note" style={{ color: "var(--success)" }}>
           ✓ Route executed. All transaction hashes are listed above and recorded on-chain.
         </p>
       )}

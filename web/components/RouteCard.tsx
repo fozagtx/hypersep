@@ -14,6 +14,60 @@ function fmtEta(sec: number): string {
   return `~${Math.round(sec / 60)}min`;
 }
 
+const CHAIN_SHORT: Record<number, { name: string; color: string }> = {
+  11155111: { name: "Sepolia", color: "var(--chain-a)" },
+  420420777: { name: "Portaldot", color: "var(--chain-b)" },
+};
+
+function chainInfo(id: number) {
+  return CHAIN_SHORT[id] ?? { name: `Chain ${id}`, color: "var(--faint)" };
+}
+
+/** The signature visual: the aggregated route as a chain of nodes and hops. */
+function RoutePath({ route }: { route: ApiRoute }) {
+  const nodes: React.ReactNode[] = [];
+
+  route.steps.forEach((step, i) => {
+    if (i === 0) {
+      const from = chainInfo(step.chainFrom);
+      nodes.push(
+        <div className="path-node" key={`from`}>
+          <span className="chain-dot" style={{ background: from.color }} />
+          <span>
+            <span className="chain-name">{from.name}</span>
+            <br />
+            <span className="token-name">{step.tokenIn}</span>
+          </span>
+        </div>
+      );
+    }
+
+    const isBridge = step.kind === "bridge";
+    const feeMatch = step.venueId.match(/-(\d+)bps$/);
+    const label = isBridge ? "bridge" : `swap · ${feeMatch ? feeMatch[1] : "30"} bps`;
+    const to = chainInfo(step.chainTo);
+
+    nodes.push(
+      <div className={`path-link${isBridge ? " bridge" : ""}`} key={`link-${i}`}>
+        <span className="link-label">{label}</span>
+      </div>
+    );
+
+    nodes.push(
+      <div className="path-node" key={`node-${i}`}>
+        <span className="chain-dot" style={{ background: to.color }} />
+        <span>
+          <span className="chain-name">{to.name}</span>
+          <br />
+          <span className="token-name">{step.tokenOut}</span>
+        </span>
+      </div>
+    );
+  });
+
+  return <div className="route-path">{nodes}</div>;
+}
+
 interface Props {
   route: ApiRoute;
   toToken: string;
@@ -23,44 +77,51 @@ interface Props {
 
 export function RouteCard({ route: r, toToken, selected, onSelect }: Props) {
   return (
-    <div className="card route-card" style={selected ? { borderColor: "var(--accent)" } : undefined}>
-      <div className="labels">
-        {r.labels.map((l) => (
-          <span key={l} className="badge accent">{l}</span>
-        ))}
-      </div>
-      <div className="route-stats">
+    <div className={`route-card${selected ? " selected" : ""}`}>
+      <div className="route-top">
         <div>
-          You receive<br />
-          <strong>{fmtAmount(r.amountOut)} {toToken}</strong>
-        </div>
-        <div>
-          Fees + gas<br />
-          <strong>${(r.totalFeeUsd + r.totalGasUsd).toFixed(2)}</strong>
-        </div>
-        <div>
-          Price impact<br />
-          <strong>{r.priceImpactPct.toFixed(2)}%</strong>
-        </div>
-        <div>
-          ETA<br />
-          <strong>{fmtEta(r.totalEtaSeconds)}</strong>
-        </div>
-      </div>
-      <div className="steps">
-        {r.steps.map((s, j) => (
-          <div className="step" key={j}>
-            <span>{s.tokenIn} → {s.tokenOut}</span>
-            <span className="venue">
-              {s.kind === "bridge" ? "bridge" : "swap"} · {s.venueId}
-              {s.chainFrom !== s.chainTo ? ` · chain ${s.chainFrom} → ${s.chainTo}` : ""}
-            </span>
+          <div className="route-pills">
+            {r.labels.map((l) => (
+              <span key={l} className={`pill${l === "Best overall" ? " best" : ""}`}>
+                {l}
+              </span>
+            ))}
           </div>
-        ))}
+          <h2>Route via {r.steps.length === 1 ? "single venue" : `${r.steps.length} hops`}</h2>
+        </div>
+        <div className="route-receive">
+          <div className="cap">You receive</div>
+          <div>
+            <span className="amount">{fmtAmount(r.amountOut)}</span>
+            <span className="token">{toToken}</span>
+          </div>
+        </div>
       </div>
-      <div style={{ marginTop: 14 }}>
-        <button onClick={onSelect} disabled={selected}>
-          {selected ? "Selected" : "Execute this route"}
+
+      <RoutePath route={r} />
+
+      <div className="route-stats">
+        <div className="stat">
+          <div className="k">Fees</div>
+          <div className="v">${r.totalFeeUsd.toFixed(2)}</div>
+        </div>
+        <div className="stat">
+          <div className="k">Gas</div>
+          <div className="v">${r.totalGasUsd.toFixed(2)}</div>
+        </div>
+        <div className="stat">
+          <div className="k">Price impact</div>
+          <div className="v">{r.priceImpactPct.toFixed(2)}%</div>
+        </div>
+        <div className="stat">
+          <div className="k">ETA</div>
+          <div className="v">{fmtEta(r.totalEtaSeconds)}</div>
+        </div>
+      </div>
+
+      <div className="route-actions">
+        <button className={selected ? "btn-ghost" : "btn-primary"} onClick={onSelect} disabled={selected}>
+          {selected ? "Selected ✓" : "Execute this route"}
         </button>
       </div>
     </div>

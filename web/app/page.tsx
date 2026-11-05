@@ -77,23 +77,44 @@ export default function Home() {
 
   return (
     <main>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 20, flexWrap: "wrap" }}>
-        <div>
-          <span className="badge accent">Portaldot Hacker House · Multi-Chain &amp; Cross-Chain Infra</span>
-          <h1>PortalX</h1>
-          <p className="subtitle">
-            Cross-chain liquidity aggregator — discover, compare, and execute the best swap routes
-            across Portaldot V3 and external EVM chains.
-          </p>
+      <header className="header">
+        <div className="brand">
+          <div className="brand-mark">P</div>
+          <div>
+            <div className="brand-name">PortalX</div>
+          </div>
+          <span className="tag">Testnet</span>
         </div>
         <ConnectButton />
+      </header>
+
+      <div>
+        <span className="eyebrow">
+          <span className="dot" />
+          Portaldot Hacker House · Multi-Chain &amp; Cross-Chain Infra
+        </span>
+        <h1>
+          Best price, across chains.
+          <br />
+          <span className="dim">One route. One signature set.</span>
+        </h1>
+        <p className="subtitle">
+          PortalX aggregates liquidity venues across Portaldot V3 and external EVM chains, ranks every
+          route by real cost — fees, gas, price impact, settlement time — and executes the winner.
+        </p>
       </div>
 
-      <div className="card">
-        <h2>Get routes</h2>
-        <div className="row">
+      <div className="panel">
+        <div className="panel-head">
+          <h2>Find a route</h2>
+          <button className="chip-btn" onClick={faucet} disabled={!isConnected}>
+            Get test tokens
+          </button>
+        </div>
+
+        <div className="leg">
           <div>
-            <label>From chain</label>
+            <label className="label">You pay · chain</label>
             <select value={fromChain} onChange={(e) => setFromChain(e.target.value)}>
               {CHAIN_OPTIONS.map((c) => (
                 <option key={c.value} value={c.value}>{c.label}</option>
@@ -101,19 +122,26 @@ export default function Home() {
             </select>
           </div>
           <div>
-            <label>Token</label>
+            <label className="label">Token</label>
             <select value={fromToken} onChange={(e) => setFromToken(e.target.value)}>
               {TOKEN_OPTIONS.map((t) => (
                 <option key={t} value={t}>{t}</option>
               ))}
             </select>
           </div>
-          <div>
-            <label>Amount</label>
+          <div className="grow">
+            <label className="label">Amount</label>
             <input value={amountIn} onChange={(e) => setAmountIn(e.target.value)} inputMode="decimal" />
           </div>
+        </div>
+
+        <div className="leg-divider">
+          <span className="leg-arrow">↓</span>
+        </div>
+
+        <div className="leg">
           <div>
-            <label>To chain</label>
+            <label className="label">You receive · chain</label>
             <select value={toChain} onChange={(e) => setToChain(e.target.value)}>
               {CHAIN_OPTIONS.map((c) => (
                 <option key={c.value} value={c.value}>{c.label}</option>
@@ -121,25 +149,21 @@ export default function Home() {
             </select>
           </div>
           <div>
-            <label>Token</label>
+            <label className="label">Token</label>
             <select value={toToken} onChange={(e) => setToToken(e.target.value)}>
               {TOKEN_OPTIONS.map((t) => (
                 <option key={t} value={t}>{t}</option>
               ))}
             </select>
           </div>
-          <button onClick={getRoutes} disabled={loading}>
-            {loading ? "Routing…" : "Compare routes"}
-          </button>
-          <button
-            onClick={faucet}
-            disabled={!isConnected}
-            style={{ background: "transparent", border: "1px solid var(--border)", color: "var(--muted)" }}
-          >
-            Get test tokens
-          </button>
+          <div className="grow" style={{ textAlign: "right" }}>
+            <button className="btn-primary" onClick={getRoutes} disabled={loading} style={{ width: "100%" }}>
+              {loading ? "Routing…" : "Compare routes"}
+            </button>
+          </div>
         </div>
-        {faucetState && <p className="footer-note" style={{ marginTop: 10 }}>{faucetState}</p>}
+
+        {faucetState && <p className="footer-note">{faucetState}</p>}
       </div>
 
       {error && <p className="warning">⚠ {error}</p>}
@@ -149,7 +173,10 @@ export default function Home() {
 
       {quote && quote.routes.length > 0 && (
         <>
-          <h2 style={{ marginTop: 24 }}>{quote.routes.length} routes found</h2>
+          <div className="routes-head">
+            <h2>{quote.routes.length} routes found</h2>
+            <span className="routes-count">ranked by total cost · {fromToken} → {toToken}</span>
+          </div>
           {quote.routes.map((r, i) => (
             <RouteCard
               key={i}
@@ -161,6 +188,12 @@ export default function Home() {
           ))}
           <p className="footer-note">Price source: {quote.priceSource}</p>
         </>
+      )}
+
+      {!quote && !error && (
+        <div className="empty">
+          Enter an amount and hit Compare routes — the aggregator ranks every venue and bridge path.
+        </div>
       )}
 
       {selectedRoute && isConnected && address && (

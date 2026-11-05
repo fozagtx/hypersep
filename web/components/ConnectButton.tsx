@@ -11,6 +11,7 @@ export function ConnectButton() {
   if (!isConnected || !address) {
     return (
       <button
+        className="btn-primary"
         onClick={async () => {
           setConnecting(true);
           try {
@@ -29,35 +30,20 @@ export function ConnectButton() {
   }
 
   return (
-    <div className="row" style={{ gap: 8, alignItems: "center" }}>
+    <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
       {Object.values(CHAINS_BY_ID).map((c) => (
         <button
           key={c.id}
+          className={`chip-btn${c.id === chainId ? " on" : ""}`}
           onClick={() => switchChain(c.id)}
-          style={{
-            background: c.id === chainId ? "var(--accent)" : "transparent",
-            border: "1px solid var(--border)",
-            color: c.id === chainId ? "#fff" : "var(--muted)",
-            padding: "6px 10px",
-            fontSize: 12,
-          }}
         >
           {c.name.replace("Ethereum ", "").replace(" V3 Testnet", "")}
         </button>
       ))}
-      <span className="badge">
+      <span className="badge-addr">
         {address.slice(0, 6)}…{address.slice(-4)}
       </span>
-      <button
-        onClick={() => disconnect()}
-        style={{
-          background: "transparent",
-          border: "1px solid var(--border)",
-          color: "var(--muted)",
-          padding: "6px 10px",
-          fontSize: 12,
-        }}
-      >
+      <button className="chip-btn" onClick={() => disconnect()}>
         Disconnect
       </button>
     </div>
