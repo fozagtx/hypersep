@@ -1,39 +1,13 @@
 "use client";
 
-import { useState } from "react";
-
-interface ApiStep {
-  venueId: string;
-  kind: "amm" | "bridge";
-  chainFrom: number;
-  chainTo: number;
-  tokenIn: string;
-  tokenOut: string;
-  amountIn: string;
-  amountOut: string;
-  feeUsd: number;
-  gasUsd: number;
-  priceImpactBps: number;
-  etaSeconds: number;
-}
-
-interface ApiRoute {
-  labels: string[];
-  amountIn: string;
-  amountOut: string;
-  totalFeeUsd: number;
-  totalGasUsd: number;
-  totalImpactUsd: number;
-  totalEtaSeconds: number;
-  score: number;
-  steps: ApiStep[];
-}
-
-interface ApiQuote {
-  routes: ApiRoute[];
-  warnings: string[];
-  priceSource: string;
-}
+import { useEffect, useState } from "react";
+import { useWallet } from "@/hooks/useWallet";
+import type { Address } from "viem";
+import { ConnectButton } from "@/components/ConnectButton";
+import { RouteCard } from "@/components/RouteCard";
+import { ExecutionPanel } from "@/components/ExecutionPanel";
+import { buildFaucetAction, sendWalletTx } from "@/lib/execution";
+import type { ApiQuote, ApiRoute, DeploymentMap } from "@/lib/types";
 
 const CHAIN_OPTIONS = [
   { value: "11155111", label: "Ethereum Sepolia" },
@@ -42,32 +16,34 @@ const CHAIN_OPTIONS = [
 
 const TOKEN_OPTIONS = ["mUSDC", "mPOT"];
 
-function fmtAmount(raw: string, decimals = 18): string {
-  const n = Number(raw) / 10 ** decimals;
-  if (n === 0) return "0";
-  if (n < 0.001) return "<0.001";
-  return n.toLocaleString("en-US", { maximumFractionDigits: 4 });
-}
-
-function fmtEta(sec: number): string {
-  if (sec < 60) return `~${sec}s`;
-  return `~${Math.round(sec / 60)}min`;
-}
-
 export default function Home() {
+  const { address, isConnected } = useWallet();
+
   const [fromChain, setFromChain] = useState("11155111");
   const [fromToken, setFromToken] = useState("mUSDC");
   const [toChain, setToChain] = useState("420420777");
   const [toToken, setToToken] = useState("mPOT");
   const [amountIn, setAmountIn] = useState("100");
+
   const [loading, setLoading] = useState(false);
   const [quote, setQuote] = useState<ApiQuote | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [selectedRoute, setSelectedRoute] = useState<ApiRoute | null>(null);
+  const [deployments, setDeployments] = useState<DeploymentMap>({});
+  const [faucetState, setFaucetState] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch("/api/deployments")
+      .then((r) => r.json())
+      .then((d) => setDeployments(d.deployments ?? {}))
+      .catch(() => setDeployments({}));
+  }, []);
 
   async function getRoutes() {
     setLoading(true);
     setError(null);
     setQuote(null);
+    setSelectedRoute(null);
     try {
       const qs = new URLSearchParams({ fromChain, fromToken, toChain, toToken, amountIn });
       const res = await fetch(`/api/quote?${qs}`);
@@ -81,14 +57,37 @@ export default function Home() {
     }
   }
 
+  async function faucet() {
+    if (!address || !isConnected) return;
+    const chainTokens = deployments[fromChain]?.tokens;
+    const tokenAddr = chainTokens?.[fromToken] as Address | undefined;
+    if (!tokenAddr) {
+      setFaucetState("Token not deployed yet — run the deploy script first.");
+      return;
+    }
+    setFaucetState("Confirm in your wallet…");
+    try {
+      const action = buildFaucetAction(tokenAddr, fromToken, address);
+      const hash = await sendWalletTx(action, Number(fromChain), address);
+      setFaucetState(`✓ Minted 1,000 ${fromToken} — tx ${hash.slice(0, 10)}…`);
+    } catch (e) {
+      setFaucetState(`⚠ ${e instanceof Error ? e.message : "Faucet failed"}`);
+    }
+  }
+
   return (
     <main>
-      <span className="badge accent">Portaldot Hacker House · Multi-Chain &amp; Cross-Chain Infra</span>
-      <h1>PortalX</h1>
-      <p className="subtitle">
-        Cross-chain liquidity aggregator — discover, compare, and route swaps across Portaldot V3
-        and external EVM chains.
-      </p>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 20, flexWrap: "wrap" }}>
+        <div>
+          <span className="badge accent">Portaldot Hacker House · Multi-Chain &amp; Cross-Chain Infra</span>
+          <h1>PortalX</h1>
+          <p className="subtitle">
+            Cross-chain liquidity aggregator — discover, compare, and execute the best swap routes
+            across Portaldot V3 and external EVM chains.
+          </p>
+        </div>
+        <ConnectButton />
+      </div>
 
       <div className="card">
         <h2>Get routes</h2>
@@ -132,7 +131,15 @@ export default function Home() {
           <button onClick={getRoutes} disabled={loading}>
             {loading ? "Routing…" : "Compare routes"}
           </button>
+          <button
+            onClick={faucet}
+            disabled={!isConnected}
+            style={{ background: "transparent", border: "1px solid var(--border)", color: "var(--muted)" }}
+          >
+            Get test tokens
+          </button>
         </div>
+        {faucetState && <p className="footer-note" style={{ marginTop: 10 }}>{faucetState}</p>}
       </div>
 
       {error && <p className="warning">⚠ {error}</p>}
@@ -144,45 +151,25 @@ export default function Home() {
         <>
           <h2 style={{ marginTop: 24 }}>{quote.routes.length} routes found</h2>
           {quote.routes.map((r, i) => (
-            <div className="card route-card" key={i}>
-              <div className="labels">
-                {r.labels.map((l) => (
-                  <span key={l} className="badge accent">{l}</span>
-                ))}
-              </div>
-              <div className="route-stats">
-                <div>
-                  You receive<br />
-                  <strong>{fmtAmount(r.amountOut)} {toToken}</strong>
-                </div>
-                <div>
-                  Fees + gas<br />
-                  <strong>${(r.totalFeeUsd + r.totalGasUsd).toFixed(2)}</strong>
-                </div>
-                <div>
-                  Price impact<br />
-                  <strong>{(r.totalImpactUsd > 0 ? (r.totalImpactUsd / (Number(r.amountIn) / 1e18 || 1)) * 100 : 0).toFixed(2)}%</strong>
-                </div>
-                <div>
-                  ETA<br />
-                  <strong>{fmtEta(r.totalEtaSeconds)}</strong>
-                </div>
-              </div>
-              <div className="steps">
-                {r.steps.map((s, j) => (
-                  <div className="step" key={j}>
-                    <span>{s.tokenIn} → {s.tokenOut}</span>
-                    <span className="venue">
-                      {s.kind === "bridge" ? "bridge" : "swap"} · {s.venueId}
-                      {s.chainFrom !== s.chainTo ? ` · chain ${s.chainFrom} → ${s.chainTo}` : ""}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <RouteCard
+              key={i}
+              route={r}
+              toToken={toToken}
+              selected={selectedRoute === r}
+              onSelect={() => setSelectedRoute(r)}
+            />
           ))}
           <p className="footer-note">Price source: {quote.priceSource}</p>
         </>
+      )}
+
+      {selectedRoute && isConnected && address && (
+        <div style={{ marginTop: 24 }}>
+          <ExecutionPanel route={selectedRoute} deployments={deployments} userAddress={address} />
+        </div>
+      )}
+      {selectedRoute && !isConnected && (
+        <p className="warning" style={{ marginTop: 20 }}>⚠ Connect your wallet to execute this route.</p>
       )}
     </main>
   );

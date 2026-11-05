@@ -66,6 +66,8 @@ export async function GET(req: NextRequest) {
       totalFeeUsd: r.totalFeeUsd,
       totalGasUsd: r.totalGasUsd,
       totalImpactUsd: r.totalImpactUsd,
+      priceImpactPct:
+        (r.totalImpactUsd / ((Number(r.amountIn) / 10 ** tokenIn.decimals) * tokenIn.priceUsd || 1)) * 100,
       totalEtaSeconds: r.totalEtaSeconds,
       score: r.score,
       steps: r.steps.map((s) => ({
