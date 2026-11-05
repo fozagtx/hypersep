@@ -120,7 +120,7 @@ export function RouteCard({ route: r, toToken, selected, onSelect }: Props) {
       </div>
 
       <div className="route-actions">
-        <button className={selected ? "btn-ghost" : "btn-primary"} onClick={onSelect} disabled={selected}>
+        <button className={selected ? "btn btn-ghost" : "btn btn-green"} onClick={onSelect} disabled={selected}>
           {selected ? "Selected ✓" : "Execute this route"}
         </button>
       </div>

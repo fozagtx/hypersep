@@ -4,7 +4,7 @@ import { loadFixture } from "@nomicfoundation/hardhat-toolbox/network-helpers";
 
 const DEADLINE = () => Math.floor(Date.now() / 1000) + 3600;
 
-describe("PortalX MiniAMM", () => {
+describe("Hypersep MiniAMM", () => {
   async function twoPoolsFixture() {
     const [deployer, trader] = await ethers.getSigners();
 

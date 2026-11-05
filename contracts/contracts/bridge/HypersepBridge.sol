@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-/// @title PortalX Bridge (testnet)
+/// @title Hypersep Bridge (testnet)
 /// @notice Custodial lock/release bridge used for real cross-chain execution
-///         paths in the PortalX demo. Users `deposit` (lock) tokens on the
+///         paths in the Hypersep demo. Users `deposit` (lock) tokens on the
 ///         source chain; an off-chain relayer verifies the deposit event and
 ///         calls `release` on the destination chain. Each release is bound to
 ///         a unique depositId and can execute exactly once.
@@ -11,7 +11,7 @@ pragma solidity ^0.8.24;
 ///         This is a testnet-grade bridge: trust is placed in the relayer.
 ///         The architecture note in the README explains how the relayer set
 ///         would be decentralized for mainnet.
-contract PortalXBridge {
+contract HypersepBridge {
     address public owner;
     address public relayer;
     uint256 public depositCount;

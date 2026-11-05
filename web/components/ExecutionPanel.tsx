@@ -138,7 +138,7 @@ export function ExecutionPanel({ route, deployments, userAddress }: Props) {
       </div>
 
       <div className="btn-row">
-        <button className="btn-accent" onClick={runAll} disabled={running}>
+        <button className="btn btn-green" onClick={runAll} disabled={running}>
           {running ? "Executing…" : finished ? "Execute again" : "Execute route"}
         </button>
       </div>

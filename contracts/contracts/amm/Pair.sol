@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-/// @title PortalX MiniAMM Pair
+/// @title Hypersep MiniAMM Pair
 /// @notice Constant-product (x*y=k) pool with a configurable swap fee, based on
 ///         the Uniswap V2 pair design. Holds reserves of token0/token1 and mints
 ///         PX-LP shares to liquidity providers.
 contract Pair {
-    string public constant name = "PortalX LP";
+    string public constant name = "Hypersep LP";
     string public constant symbol = "PX-LP";
     uint8 public constant decimals = 18;
 

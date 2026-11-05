@@ -67,7 +67,7 @@ export async function POST(req: NextRequest) {
     const bridgeAddress = srcDep.bridge.toLowerCase();
     const depositLog = receipt.logs.find((l) => l.address.toLowerCase() === bridgeAddress);
     if (!depositLog) {
-      return NextResponse.json({ error: "No PortalXBridge deposit found in transaction" }, { status: 400 });
+      return NextResponse.json({ error: "No HypersepBridge deposit found in transaction" }, { status: 400 });
     }
 
     const decoded = decodeEventLog({

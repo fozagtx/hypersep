@@ -3,7 +3,7 @@ pragma solidity ^0.8.24;
 
 import {Pair} from "./Pair.sol";
 
-/// @title PortalX MiniAMM Factory
+/// @title Hypersep MiniAMM Factory
 /// @notice Creates fee-configurable constant-product pairs, keyed by
 ///         (tokenA, tokenB, feeBps). Two pools of the same token pair with
 ///         different fees = two venues the aggregator can route between.

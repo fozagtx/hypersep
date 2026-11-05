@@ -82,7 +82,7 @@ export function buildActions(
         stepIndex,
         type: "approve",
         chainId: step.chainFrom,
-        label: `Approve ${step.tokenIn} for PortalX Bridge`,
+        label: `Approve ${step.tokenIn} for Hypersep Bridge`,
         to: tokenIn,
         data: encodeFunctionData({ abi: ERC20_ABI, functionName: "approve", args: [bridge, amountIn] }),
       });

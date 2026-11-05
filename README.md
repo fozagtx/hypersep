@@ -1,4 +1,4 @@
-# PortalX — Cross-Chain Liquidity Aggregator
+# Hypersep — Cross-Chain Liquidity Aggregator
 
 > Discover, compare, and execute the best swap routes across **Portaldot V3** and external EVM chains — one quote instead of manually bridging, switching networks, and hunting pools.
 
@@ -10,15 +10,15 @@
 
 A user holding USDC on Ethereum who wants POT on Portaldot must pick a bridge, pay its fees blindly, switch networks in their wallet, then find a pool with decent depth — with no way to compare total cost, slippage, or settlement time before committing.
 
-## What PortalX does
+## What Hypersep does
 
-PortalX queries every liquidity venue it knows — AMM pools on each chain plus bridge paths between chains — and returns **ranked routes with a full cost breakdown**: output amount, fees, gas, price impact, and estimated settlement time. The user sees the trade-offs and picks; the protocol handles the path.
+Hypersep queries every liquidity venue it knows — AMM pools on each chain plus bridge paths between chains — and returns **ranked routes with a full cost breakdown**: output amount, fees, gas, price impact, and estimated settlement time. The user sees the trade-offs and picks; the protocol handles the path.
 
 ## Architecture
 
 ```
                        ┌──────────────────────────────┐
-                       │        PortalX DApp          │
+                       │        Hypersep DApp          │
                        │  Next.js · swap form · ranked│
                        │  route cards · tx tracking   │
                        └──────────────┬───────────────┘
@@ -57,7 +57,7 @@ It returns the top 3 with labels: **Best overall / Cheapest / Fastest**.
 ## Repository layout
 
 ```
-portalx/
+hypersep/
 ├── contracts/            # Hardhat — Solidity 0.8.24
 │   ├── contracts/
 │   │   ├── TestERC20.sol         # mock USDC / POT with testnet faucet
@@ -123,7 +123,7 @@ Deployment writes contract addresses and transaction hashes to
 
 ## Why Portaldot is essential
 
-PortalX's route graph is chain-agnostic, but its **settlement hub is Portaldot**: WASM/EVM compatibility lets the same aggregation logic price both Solidity and ink! venues, Portaldot's cross-chain layer is the messaging fabric the bridge adapters target, and low fees make multi-hop routes economically viable where they wouldn't be on L1 Ethereum.
+Hypersep's route graph is chain-agnostic, but its **settlement hub is Portaldot**: WASM/EVM compatibility lets the same aggregation logic price both Solidity and ink! venues, Portaldot's cross-chain layer is the messaging fabric the bridge adapters target, and low fees make multi-hop routes economically viable where they wouldn't be on L1 Ethereum.
 
 ## Honest scope notes
 

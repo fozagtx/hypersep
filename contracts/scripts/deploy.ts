@@ -3,12 +3,12 @@ import * as fs from "fs";
 import * as path from "path";
 
 /**
- * PortalX testnet deployment:
+ * Hypersep testnet deployment:
  *  1. Mock USDC + Mock POT (open-faucet test tokens)
  *  2. MiniAMM Factory + Router
  *  3. Two USDC/POT pools with different fees (30 bps and 10 bps) and different
  *     reserve ratios, so the aggregator has two real venues to compare
- *  4. PortalXBridge with the deployer as testnet relayer, funded with
+ *  4. HypersepBridge with the deployer as testnet relayer, funded with
  *     destination-side liquidity
  *  5. Writes addresses + tx hashes into web/lib/engine/deployments.json
  *
@@ -78,7 +78,7 @@ async function main() {
 
   // 4. Bridge (testnet relayer = deployer unless RELAYER_ADDRESS is set)
   const relayerAddress = process.env.RELAYER_ADDRESS || deployer.address;
-  const Bridge = await ethers.getContractFactory("PortalXBridge");
+  const Bridge = await ethers.getContractFactory("HypersepBridge");
   const bridge = await Bridge.deploy(relayerAddress);
   await bridge.waitForDeployment();
   txHashes.bridgeDeploy = bridge.deploymentTransaction()!.hash;

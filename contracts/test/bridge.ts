@@ -2,14 +2,14 @@ import { expect } from "chai";
 import { ethers } from "hardhat";
 import { loadFixture } from "@nomicfoundation/hardhat-toolbox/network-helpers";
 
-describe("PortalXBridge", () => {
+describe("HypersepBridge", () => {
   async function bridgeFixture() {
     const [owner, relayer, user, recipient, stranger] = await ethers.getSigners();
 
     const Token = await ethers.getContractFactory("TestERC20");
     const usdc = await Token.deploy("Mock USD Coin", "mUSDC", 18, ethers.parseEther("10000000"));
 
-    const Bridge = await ethers.getContractFactory("PortalXBridge");
+    const Bridge = await ethers.getContractFactory("HypersepBridge");
     const bridge = await Bridge.deploy(relayer.address);
 
     await bridge.setSupportedToken(await usdc.getAddress(), true);

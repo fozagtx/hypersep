@@ -11,7 +11,7 @@ export function ConnectButton() {
   if (!isConnected || !address) {
     return (
       <button
-        className="btn-primary"
+        className="btn btn-white"
         onClick={async () => {
           setConnecting(true);
           try {

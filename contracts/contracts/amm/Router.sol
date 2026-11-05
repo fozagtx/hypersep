@@ -9,7 +9,7 @@ interface IFactory {
     function createPair(address tokenA, address tokenB, uint16 feeBps) external returns (address);
 }
 
-/// @title PortalX MiniAMM Router
+/// @title Hypersep MiniAMM Router
 /// @notice Liquidity provisioning + multi-hop swaps against fee-tiered MiniAMM
 ///         pairs, with the same on-chain quote math the off-chain engine uses.
 contract Router {
