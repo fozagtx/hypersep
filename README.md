@@ -249,6 +249,41 @@ For any other host, `npm run build` then `npm start` works.
 | Chain ID (EVM) | `420420777` |
 | Node explorer | https://node-console.portaldot.dev/ |
 
+## Contract details
+
+Status: **not deployed yet**. The deploy script and contracts are ready; the deployer needs roughly 200 tPOT on Portaldot for the first contract's gas and storage deposit hold.
+
+| Item | Value |
+|---|---|
+| Network | Portaldot V3 Testnet |
+| Chain ID | `420420777` |
+| EVM RPC | `https://test-evm-rpc-v3.portaldot.dev` |
+| Node RPC | `wss://test-node-v3.portaldot.dev` |
+| Explorer | https://node-console.portaldot.dev/ |
+| Deployer EVM | `0x421D297A9d9ba5112Ede43E96F83a54C4e4AafDb` |
+| Deployer native | `5DZPgRPx9vvXf2FuSsm3WzVXBwhQkTSaCnP3yWT7s2inqpyr` |
+| Deployment config | `lib/engine/deployments.json` |
+
+Contracts deployed by `contracts/scripts/deploy.ts`:
+
+| Contract | Purpose |
+|---|---|
+| `TestERC20` mUSDC | Mock USD Coin, 18 decimals, open mint faucet |
+| `TestERC20` mPOT | Mock POT, 18 decimals, open mint faucet |
+| `Factory` | Fee-tiered pair registry for venue discovery |
+| `Router` | `addLiquidity`, swaps, on-chain quotes |
+| `Pair` 30 bps | USDC/POT constant-product pool |
+| `Pair` 10 bps | USDC/POT constant-product pool |
+| `HypersepBridge` | Lock and release testnet bridge, deployer as relayer |
+
+Links:
+
+- Contracts source: https://github.com/fozagtx/hypersep/tree/main/contracts
+- Deploy script: https://github.com/fozagtx/hypersep/blob/main/contracts/scripts/deploy.ts
+- Repository: https://github.com/fozagtx/hypersep
+
+After the deploy runs, `lib/engine/deployments.json` holds the chain id, factory, router, bridge, relayer, token addresses, pair addresses, and every transaction hash. `/api/deployments` returns the same data, and the dashboard Contracts panel renders it.
+
 ## Why Portaldot is essential
 
 Hypersep's route graph is chain-agnostic, but its **settlement hub is Portaldot**: WASM/EVM compatibility lets the same aggregation logic price both Solidity and ink! venues, Portaldot's cross-chain layer is the messaging fabric the bridge adapters target, and low fees make multi-hop routes economically viable where they would not be on L1 Ethereum.

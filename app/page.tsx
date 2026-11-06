@@ -228,7 +228,7 @@ export default function Home() {
       <footer className="footer">
         <span>Hypersep - Cross-chain liquidity aggregator - Testnet prototype</span>
         <span>
-          <a href="/dashboard">Swap</a> · <a href="/contracts">Contracts</a> · <a href="#faq">FAQs</a>
+          <a href="/dashboard">Swap</a> · <a href="#faq">FAQs</a>
         </span>
       </footer>
     </>
