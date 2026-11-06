@@ -1,11 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useWallet } from "@/hooks/useWallet";
 import type { Address } from "viem";
 import { ConnectButton } from "@/components/ConnectButton";
 import { RouteCard } from "@/components/RouteCard";
 import { ExecutionPanel } from "@/components/ExecutionPanel";
+import { HypersepMark, PortaldotMark, ClaudeMark, OpenAIMark } from "@/components/logos";
+import { RevealObserver } from "@/components/Reveal";
 import { buildFaucetAction, sendWalletTx } from "@/lib/execution";
 import type { ApiQuote, ApiRoute, DeploymentMap } from "@/lib/types";
 
@@ -32,6 +34,19 @@ export default function Home() {
   const [deployments, setDeployments] = useState<DeploymentMap>({});
   const [faucetState, setFaucetState] = useState<string | null>(null);
 
+  const swapRef = useRef<HTMLDivElement | null>(null);
+  const wasConnected = useRef(false);
+
+  // On wallet connect, land the user on the swap card instead of leaving them
+  // parked on the marketing surface.
+  useEffect(() => {
+    if (isConnected && !wasConnected.current) {
+      wasConnected.current = true;
+      swapRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+    if (!isConnected) wasConnected.current = false;
+  }, [isConnected]);
+
   useEffect(() => {
     fetch("/api/deployments")
       .then((r) => r.json())
@@ -49,7 +64,9 @@ export default function Home() {
       const res = await fetch(`/api/quote?${qs}`);
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Quote failed");
-      setQuote(data as ApiQuote);
+      const q = data as ApiQuote;
+      setQuote(q);
+      if (q.routes?.length) setSelectedRoute(q.routes[0]);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Quote failed");
     } finally {
@@ -77,39 +94,43 @@ export default function Home() {
 
   return (
     <>
-      <nav className="navbar">
-        <div className="brand">
-          <div className="brand-mark">H</div>
-          <span className="brand-name">Hypersep</span>
-          <span className="tag">Testnet</span>
+      <RevealObserver />
+      <header className="wh" id="top">
+        <div className="wh-veil" aria-hidden="true">
+          <i />
+          <i />
+          <i />
+          <i />
         </div>
-        <div className="navbar-links">
-          <a href="#swap">Swap</a>
-          <a href="#highlights">Venues</a>
-          <a href="/docs">Aggregator API</a>
-          <a href="#faq">FAQs</a>
+        <a className="wh-logo" href="/#top" aria-label="Hypersep">
+          <HypersepMark size={21} />
+          <span>Hypersep</span>
+        </a>
+        <div className="wh-right">
+          <a className="wh-link" href="#swap">Swap</a>
+          <a className="wh-link" href="#access">Agents</a>
+          <a className="wh-link" href="#highlights">Venues</a>
+          <a className="wh-link" href="/docs">API</a>
+          <a className="wh-link" href="#faq">FAQs</a>
+          <ConnectButton />
         </div>
-        <ConnectButton />
-      </nav>
+      </header>
 
       <section className="hero">
         <div className="hero-inner">
-          <span className="eyebrow">
-            <span className="dot" />
-            Portaldot Hacker House - Multi-Chain and Cross-Chain Infra
-          </span>
-          <h1>
-            Trade across chains
+          <h1 className="blur-in">
+            Every chain,
             <br />
-            <span className="accent-line">at the best route.</span>
+            one best route.
           </h1>
-          <p className="sub">
-            Hypersep is a cross-chain aggregator that finds the best route for your swaps. Quick,
-            secure, any tokens in any size, at the best prices.
+          <p className="sub blur-in d1">
+            Hypersep is an AI-first exchange and trade aggregator. Describe the trade, and it reads
+            every pool and bridge, prices the whole path, and settles it across Portaldot and EVM
+            chains.
           </p>
-          <div className="hero-actions">
+          <div className="hero-actions blur-in d2">
             <button className="btn btn-green" onClick={getRoutes} disabled={loading}>
-              {loading ? "Routing…" : "Compare routes"}
+              {loading ? "Routing…" : "Find best route"}
             </button>
             <button className="btn btn-outline" onClick={faucet} disabled={!isConnected}>
               Get test tokens
@@ -122,16 +143,19 @@ export default function Home() {
       <div className="partners">
         <p>Venues aggregated</p>
         <div className="partners-row">
-          <span>Portaldot V3 Testnet</span>
-          <span>Ethereum Sepolia</span>
-          <span>MiniAMM 30 bps</span>
-          <span>MiniAMM 10 bps</span>
-          <span>Hypersep Bridge</span>
+          <span className="venue">
+            <PortaldotMark size={15} />
+            <span>Portaldot V3</span>
+          </span>
+          <span className="venue">Ethereum Sepolia</span>
+          <span className="venue">MiniAMM 30 bps</span>
+          <span className="venue">MiniAMM 10 bps</span>
+          <span className="venue">Hypersep Bridge</span>
         </div>
       </div>
 
       <section className="wrap" id="swap">
-        <div className="swap-card">
+        <div className="swap-card" ref={swapRef}>
           <div className="panel-head">
             <h2>Find a route</h2>
             <span className="tag">Sepolia to Portaldot</span>
@@ -183,7 +207,7 @@ export default function Home() {
             </div>
             <div className="grow" style={{ textAlign: "right" }}>
               <button className="btn btn-white" onClick={getRoutes} disabled={loading} style={{ width: "100%" }}>
-                {loading ? "Routing…" : "Compare routes"}
+                {loading ? "Routing…" : "Find best route"}
               </button>
             </div>
           </div>
@@ -211,29 +235,144 @@ export default function Home() {
                 />
               ))}
               <p className="footer-note">Price source: {quote.priceSource}</p>
+              {quote.demo && (
+                <p className="warning">
+                  Demo mode: contracts are not deployed yet, so these routes use seeded liquidity.
+                  Run the deploy script to quote and execute against real testnet pools.
+                </p>
+              )}
             </>
           )}
 
           {!quote && !error && (
             <div className="empty" style={{ marginTop: 18 }}>
-              Enter an amount and press Compare routes. Every venue and bridge path gets ranked.
+              Enter an amount and press Find best route. Every venue and bridge path gets ranked.
             </div>
           )}
 
-          {selectedRoute && isConnected && address && (
+          {selectedRoute && isConnected && address && !quote?.demo && (
             <div style={{ marginTop: 24 }}>
               <ExecutionPanel route={selectedRoute} deployments={deployments} userAddress={address} />
             </div>
           )}
-          {selectedRoute && !isConnected && (
+          {selectedRoute && !isConnected && !quote?.demo && (
             <p className="warning" style={{ marginTop: 20 }}>Connect your wallet to execute this route.</p>
           )}
         </div>
       </section>
 
+      <section className="duo-section reveal" id="access">
+        <h2>One aggregator, two front doors</h2>
+        <p className="lead">
+          The route engine is the same either way. Quote it yourself in the app, or let an agent
+          quote it over MCP and execute the path it picks.
+        </p>
+
+        <div className="duo">
+          <div className="duo-card">
+            <div className="duo-cap">
+              <span className="k">In the app</span>
+              <span className="v">You trade</span>
+            </div>
+            <div className="phone">
+              <div className="phone-island" aria-hidden="true" />
+              <div className="phone-screen">
+                <div className="phone-status">
+                  <span>9:41</span>
+                  <span>Hypersep</span>
+                </div>
+                <div className="swap-mini">
+                  <div className="mini-title">
+                    Swap
+                    <span>Best route across every venue</span>
+                  </div>
+                  <div className="mini-leg">
+                    <div className="k">You pay</div>
+                    <div className="row">
+                      <span className="amt">100.00</span>
+                      <span className="tok">mUSDC · Sepolia</span>
+                    </div>
+                  </div>
+                  <div className="mini-hop">
+                    <i />
+                    bridge + swap · 30 bps
+                    <i />
+                  </div>
+                  <div className="mini-leg">
+                    <div className="k">You receive</div>
+                    <div className="row">
+                      <span className="amt">1,238.4</span>
+                      <span className="tok">mPOT · Portaldot</span>
+                    </div>
+                  </div>
+                  <span className="mini-pill">Best overall · ~6s</span>
+                </div>
+                <div className="mini-cta">Execute route</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="duo-card">
+            <div className="duo-cap">
+              <span className="k">In your agent</span>
+              <span className="v">MCP connected</span>
+            </div>
+            <div className="phone">
+              <div className="phone-island" aria-hidden="true" />
+              <div className="phone-screen">
+                <div className="phone-status">
+                  <span>9:41</span>
+                  <span>Agent</span>
+                </div>
+                <div className="chat">
+                  <div className="bubble user">
+                    Cheapest route for 100 mUSDC on Sepolia into mPOT on Portaldot?
+                  </div>
+                  <div className="bubble agent">
+                    <span className="who">
+                      <ClaudeMark size={10} /> Claude · hypersep_quote
+                    </span>
+                    Three routes. Cheapest is bridge then the 10 bps pool — best output, $0.61 in
+                    fees.
+                    <span className="mono">
+                      simbridge-sepolia-portaldot → miniamm-420420777-10bps
+                    </span>
+                  </div>
+                </div>
+                <div className="agent-strip">
+                  <span className="k">Connected agents</span>
+                  <div className="agent-rows">
+                    <div className="agent-row">
+                      <ClaudeMark size={12} />
+                      <span className="name">Claude Code</span>
+                      <span>/api/mcp</span>
+                      <span className="dot" />
+                    </div>
+                    <div className="agent-row">
+                      <OpenAIMark size={12} />
+                      <span className="name">ChatGPT</span>
+                      <span>/api/mcp</span>
+                      <span className="dot" />
+                    </div>
+                    <div className="agent-row">
+                      <OpenAIMark size={12} />
+                      <span className="name">Codex</span>
+                      <span>/api/mcp</span>
+                      <span className="dot" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <p className="duo-foot">Same engine, same quote — the phone is only a viewport.</p>
+      </section>
+
       <section className="light" id="highlights">
-        <div className="light-inner">
-          <h2>Production-ready routing you can depend on</h2>
+        <div className="light-inner reveal">
+          <h2>Routing that reads the whole market, not one pool</h2>
           <div className="bento">
             <div className="cell">
               <div className="big">Top 3</div>
@@ -271,8 +410,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="features" id="api">
-        <h2>The most powerful cross-chain aggregator API</h2>
+      <section className="features reveal" id="api">          <h2>An aggregator API built for agents</h2>
         <p className="lead">
           Aggregator API. Designed for best execution. Ranked routes with fees, gas, price impact
           and settlement time on every response.
@@ -293,7 +431,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="faq" id="faq">
+      <section className="faq reveal" id="faq">
         <h2>FAQs</h2>
         <div className="faq-item">
           <strong>What is Hypersep?</strong>

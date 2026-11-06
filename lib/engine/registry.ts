@@ -1,8 +1,8 @@
-import { readFileSync } from "fs";
-import { join } from "path";
 import type { Address, Token, VenueAdapter } from "./types";
 import { createAmmAdapter } from "./adapters/amm";
 import { createBridgeAdapter } from "./adapters/bridge";
+import { getDemoTokens, getDemoVenues } from "./demo";
+import deploymentsJson from "./deployments.json";
 
 // ------------------------------------------------------------------ chains
 
@@ -48,18 +48,23 @@ export interface Deployment {
 }
 
 export function loadDeployments(): Record<string, Deployment> {
-  try {
-    const raw = readFileSync(join(process.cwd(), "lib", "engine", "deployments.json"), "utf8");
-    return JSON.parse(raw);
-  } catch {
-    return {};
-  }
+  // Imported at build time so the file is bundled reliably on serverless
+  // hosts (Vercel). Rerun the deploy script, then rebuild, to pick up new
+  // contract addresses.
+  return (deploymentsJson ?? {}) as Record<string, Deployment>;
+}
+
+/** True when no contracts have been deployed yet, so quotes use demo liquidity. */
+export function isDemoMode(): boolean {
+  return Object.keys(loadDeployments()).length === 0;
 }
 
 // ---------------------------------------------------------- token registry
 
 export function getTokens(): Token[] {
   const deployments = loadDeployments();
+  if (Object.keys(deployments).length === 0) return getDemoTokens();
+
   const tokens: Token[] = [];
   for (const [chainIdKey, dep] of Object.entries(deployments)) {
     const chainId = Number(chainIdKey);
@@ -79,6 +84,8 @@ export function findToken(symbol: string, chainId: number): Token | undefined {
 
 export function getVenues(): VenueAdapter[] {
   const deployments = loadDeployments();
+  if (Object.keys(deployments).length === 0) return getDemoVenues();
+
   const venues: VenueAdapter[] = [];
 
   for (const [chainIdKey, dep] of Object.entries(deployments)) {

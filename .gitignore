@@ -19,3 +19,12 @@ next-env.d.ts
 # misc
 .DS_Store
 *.log
+
+# typescript build info
+*.tsbuildinfo
+
+# local agent config
+.commandcode/
+
+# vercel
+.vercel/

@@ -87,5 +87,6 @@ export async function GET(req: NextRequest) {
     })),
     warnings: result.warnings,
     priceSource: result.priceSource,
+    demo: result.demo,
   });
 }

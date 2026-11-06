@@ -10,22 +10,31 @@ export function ConnectButton() {
 
   if (!isConnected || !address) {
     return (
-      <button
-        className="btn btn-white"
-        onClick={async () => {
-          setConnecting(true);
-          try {
-            await connect();
-          } catch {
-            /* user rejected or no wallet */
-          } finally {
-            setConnecting(false);
-          }
-        }}
-        disabled={connecting}
-      >
-        {connecting ? "Connecting…" : "Connect Wallet"}
-      </button>
+      <div className="mgb mgb--header">
+        <button
+          className="mgb-btn"
+          onClick={async () => {
+            setConnecting(true);
+            try {
+              await connect();
+            } catch {
+              /* user rejected or no wallet */
+            } finally {
+              setConnecting(false);
+            }
+          }}
+          disabled={connecting}
+        >
+          <span className="mgb-label">
+            {connecting ? "Connecting" : "Connect"}
+            <span className="mgb-shine" aria-hidden="true" />
+          </span>
+          <span className="mgb-ring" aria-hidden="true" />
+        </button>
+        <div className="mgb-shadow" aria-hidden="true">
+          <span />
+        </div>
+      </div>
     );
   }
 

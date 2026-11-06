@@ -33,6 +33,7 @@ export interface ApiQuote {
   routes: ApiRoute[];
   warnings: string[];
   priceSource: string;
+  demo?: boolean;
 }
 
 export interface DeploymentEntry {

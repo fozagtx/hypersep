@@ -1,5 +1,5 @@
 import type { QuoteRequest, Route, Token } from "./types";
-import { getTokens, getVenues } from "./registry";
+import { getTokens, getVenues, isDemoMode } from "./registry";
 import { findPaths, quoteEdges } from "./graph";
 import { buildRoute, labelRoutes } from "./scoring";
 
@@ -8,15 +8,18 @@ export interface QuoteResult {
   warnings: string[];
   /** Mock oracle disclaimer surfaced to the UI. */
   priceSource: string;
+  /** True when quotes come from seeded demo liquidity, not deployed contracts. */
+  demo: boolean;
 }
 
 export async function getTopRoutes(req: QuoteRequest, topK = 3): Promise<QuoteResult> {
   const warnings: string[] = [];
+  const demo = isDemoMode();
   const tokens = getTokens();
   const venues = getVenues();
 
-  if (venues.length <= 2) {
-    warnings.push("No AMM venues deployed yet — run contracts/scripts/deploy.ts to create pools.");
+  if (!demo && venues.length <= 2) {
+    warnings.push("No AMM venues deployed yet. Run contracts/scripts/deploy.ts to create pools.");
   }
 
   const edges = await quoteEdges(venues, tokens, req.amountIn, req.tokenIn);
@@ -65,7 +68,10 @@ export async function getTopRoutes(req: QuoteRequest, topK = 3): Promise<QuoteRe
   return {
     routes: top,
     warnings,
-    priceSource: "mock testnet oracle (static prices) — labeled in UI",
+    priceSource: demo
+      ? "demo mode: seeded liquidity, contracts not deployed yet"
+      : "mock testnet oracle (static prices), labeled in UI",
+    demo,
   };
 }
 

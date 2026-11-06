@@ -10,7 +10,7 @@ import * as path from "path";
  *     reserve ratios, so the aggregator has two real venues to compare
  *  4. HypersepBridge with the deployer as testnet relayer, funded with
  *     destination-side liquidity
- *  5. Writes addresses + tx hashes into web/lib/engine/deployments.json
+ *  5. Writes addresses + tx hashes into lib/engine/deployments.json
  *
  * Usage: npx hardhat run scripts/deploy.ts --network portaldot
  */
@@ -92,7 +92,7 @@ async function main() {
   console.log(`Bridge: ${await bridge.getAddress()} (relayer ${relayerAddress})`);
 
   // 5. Persist for the quote engine + frontend execution
-  const deploymentsPath = path.join(__dirname, "..", "..", "web", "lib", "engine", "deployments.json");
+  const deploymentsPath = path.join(__dirname, "..", "..", "lib", "engine", "deployments.json");
   let deployments: Record<string, any> = {};
   try {
     deployments = JSON.parse(fs.readFileSync(deploymentsPath, "utf8"));
