@@ -196,57 +196,6 @@ export function TradeDashboard() {
           )}
         </div>
       </div>
-
-      <section className="contracts-panel">
-        <div className="panel-head">
-          <h2>Contracts</h2>
-          <span className="tag">Portaldot V3 testnet · 420420777</span>
-        </div>
-
-        {Object.keys(deployments).length === 0 ? (
-          <div className="contract-empty">
-            <p>Not deployed yet. Fund the deployer with tPOT, then run the deploy script.</p>
-            <div className="contract-grid">
-              <div className="contract-card">
-                <div className="k">Deployer EVM</div>
-                <code>0x421D297A9d9ba5112Ede43E96F83a54C4e4AafDb</code>
-              </div>
-              <div className="contract-card">
-                <div className="k">Deployer native</div>
-                <code>5DZPgRPx9vvXf2FuSsm3WzVXBwhQkTSaCnP3yWT7s2inqpyr</code>
-              </div>
-            </div>
-            <p className="contract-note">
-              Run <code>contracts/scripts/deploy.ts</code> after funding the deployer, then this
-              panel fills with Factory, Router, Bridge, token, and pool addresses.
-            </p>
-          </div>
-        ) : (
-          Object.entries(deployments).map(([chainId, dep]) => (
-            <div key={chainId} className="contract-chain">
-              <div className="contract-chain-head">
-                <span>Chain {chainId}</span>
-                <span>{dep.network}</span>
-              </div>
-              <div className="contract-grid">
-                {[
-                  ["Factory", dep.factory],
-                  ["Router", dep.router],
-                  ["Bridge", dep.bridge],
-                  ...Object.entries(dep.tokens).map(([s, a]) => [`Token ${s}`, a]),
-                  ...Object.entries(dep.pairs).map(([k, a]) => [k, a]),
-                ].map(([label, addr]) => (
-                  <div className="contract-card" key={`${chainId}-${label}`}>
-                    <div className="k">{label}</div>
-                    <code>{addr}</code>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))
-        )}
-
-      </section>
     </>
   );
 }

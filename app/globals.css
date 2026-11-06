@@ -458,10 +458,12 @@ body {
 .dashboard-grid .swap-card { max-width: none; margin: 0; }
 .dashboard-results {
   min-width: 0;
-  max-height: calc(100vh - 250px);
+  max-height: calc(100vh - 220px);
   overflow-y: auto;
-  padding-right: 6px;
+  overscroll-behavior: contain;
+  padding-right: 10px;
   scrollbar-width: thin;
+  scrollbar-gutter: stable;
 }
 .dashboard-results .routes-head { margin-top: 0; }
 .dashboard-results .empty { margin-top: 0; }
@@ -1237,62 +1239,4 @@ input { width: 130px; }
   border-color: var(--ink);
 }
 
-/* ------------------------------------------------------------- contracts */
-.contracts-panel {
-  max-width: 1040px;
-  margin: 18px auto 0;
-  padding: 20px 22px;
-  background: var(--canvas);
-  border: 1px solid var(--hair-soft);
-  border-radius: var(--radius);
-  box-shadow: var(--sheet);
-}
-.contracts-panel .panel-head { margin-bottom: 12px; }
-.contract-empty > p {
-  color: var(--ink-2);
-  font-size: 13px;
-  margin-bottom: 12px;
-}
-.contract-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
-}
-.contract-card {
-  min-width: 0;
-  padding: 12px 14px;
-  background: var(--wash);
-  border: 1px solid var(--hair-soft);
-  border-radius: 12px;
-}
-.contract-card .k {
-  margin-bottom: 6px;
-  font-family: var(--font-mono);
-  font-size: 9.5px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--ink-3);
-}
-.contract-card code {
-  font-family: var(--font-mono);
-  font-size: 11.5px;
-  color: var(--ink);
-  word-break: break-all;
-}
-.contract-note { margin-top: 12px; color: var(--ink-3); font-size: 12px; }
-.contract-note code { font-family: var(--font-mono); }
-.contract-chain + .contract-chain { margin-top: 16px; }
-.contract-chain-head {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 8px;
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--ink-3);
-}
-@media (max-width: 640px) {
-  .contract-grid { grid-template-columns: 1fr; }
-}
 
