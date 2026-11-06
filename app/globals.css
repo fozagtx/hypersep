@@ -253,29 +253,109 @@ body {
 .hero-inner {
   max-width: var(--wide);
   margin: 0 auto;
-  padding: clamp(132px, 18vh, 196px) var(--gut) clamp(44px, 6vh, 72px);
-  text-align: center;
+  padding: clamp(120px, 15vh, 172px) var(--gut) clamp(52px, 7vh, 84px);
+  display: grid;
+  grid-template-columns: minmax(0, 1.02fr) minmax(0, 1fr);
+  gap: clamp(28px, 4.5vw, 72px);
+  align-items: center;
+  text-align: left;
 }
+
+.hero-copy { max-width: 560px; }
 
 .hero h1 {
   font-family: var(--font-display);
-  font-size: clamp(44px, 7.2vw, 92px);
+  font-size: clamp(40px, 5.6vw, 78px);
   font-weight: 400;
   font-style: normal;
   letter-spacing: -0.04em;
-  line-height: 0.94;
-  margin: 0 auto 22px;
-  max-width: 18ch;
+  line-height: 0.96;
+  margin: 0 0 22px;
+  max-width: 15ch;
 }
 
 .hero .sub {
   font-size: 16.5px; line-height: 1.6;
   color: var(--ink-2);
-  max-width: 52ch;
-  margin: 0 auto 28px;
+  max-width: 50ch;
+  margin: 0 0 28px;
 }
 
-.hero-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+.hero-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-start; }
+
+/* iPhone Duo (jal-co/iphone-duo, MIT component code).
+   The Apple model + textures are not MIT; see THIRD_PARTY.md. */
+.hero-device {
+  width: 100%;
+  max-width: 560px;
+  margin: 0 auto;
+}
+.hero-device--loading { min-height: 460px; }
+.hero-duo { width: 100%; }
+
+.hero-device-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.hero-device-foot .duo-credit {
+  min-height: auto;
+  font-size: 10px;
+  color: var(--ink-3);
+}
+
+.duo-root { position: relative; isolation: isolate; }
+.duo-background { position: absolute; inset: 0; z-index: -1; pointer-events: none; }
+.duo-device { position: relative; width: 100%; height: 520px; }
+.duo-device canvas { display: block; width: 100%; height: 100%; }
+.duo-device-target {
+  position: absolute;
+  inset: 8% 12%;
+  border: 0;
+  border-radius: 24px;
+  background: transparent;
+  cursor: grab;
+  touch-action: pan-y;
+}
+.duo-device-target:active { cursor: grabbing; }
+.duo-device-target:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
+.duo-device-target:disabled { cursor: wait; }
+.duo-status {
+  position: absolute;
+  inset: 45% 16% auto;
+  padding: 12px 16px;
+  text-align: center;
+  font-size: 13px;
+  line-height: 20px;
+  color: var(--ink-2);
+  background: var(--paper);
+  border-radius: 8px;
+  pointer-events: none;
+}
+.duo-credit {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: inherit;
+  text-decoration: none;
+  text-underline-offset: 4px;
+  white-space: nowrap;
+}
+.duo-credit:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
+.duo-scrubber {
+  width: 136px;
+  height: 44px;
+  accent-color: var(--ink);
+  cursor: ew-resize;
+}
+@media (hover: hover) and (pointer: fine) { .duo-credit:hover { text-decoration: underline; } }
 
 /* Buttons: near-black pills, quiet outline, hairline ghost */
 .btn {
@@ -784,333 +864,23 @@ input { width: 130px; }
 }
 .partners-row .venue span { white-space: nowrap; }
 
-/* ---------------------------------------------------- duo: app vs agent
-   Two device cards: the trade as a person uses it, and the same trade as an
-   agent uses it over MCP. */
-.duo-section {
-  max-width: var(--wide);
-  margin: 0 auto;
-  padding: clamp(52px, 8vh, 88px) var(--gut);
-  border-top: 1px solid var(--hair-soft);
+
+@media (max-width: 980px) {
+  .hero-inner {
+    grid-template-columns: 1fr;
+    padding-top: clamp(112px, 14vh, 150px);
+  }
+  .hero-copy { max-width: 620px; }
+  .hero-device { margin-top: 16px; }
 }
 
-.duo-section h2 {
-  font-family: var(--font-display);
-  font-size: clamp(28px, 4.2vw, 46px);
-  font-weight: 400;
-  letter-spacing: -0.035em;
-  line-height: 1.04;
-  max-width: 22ch;
-  margin-bottom: 12px;
+@media (max-width: 760px) {
+  .wh-link { display: none; }
+  .wh-logo { min-width: 0; }
 }
 
-.duo-section .lead {
-  color: var(--ink-2);
-  font-size: 15px;
-  max-width: 52ch;
-  margin-bottom: 34px;
-}
-
-.duo {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18px;
-}
-
-.duo-card {
-  background: var(--canvas);
-  border: 1px solid var(--hair-soft);
-  border-radius: 26px;
-  padding: 20px 20px 24px;
-  box-shadow: var(--sheet);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
-  overflow: hidden;
-  position: relative;
-}
-
-.duo-card::after {
-  content: "";
-  position: absolute;
-  inset: auto -20% -60% -20%;
-  height: 70%;
-  background: radial-gradient(
-    60% 100% at 50% 100%,
-    rgba(25, 25, 25, 0.05),
-    rgba(25, 25, 25, 0)
-  );
-  pointer-events: none;
-}
-
-.duo-cap {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  gap: 10px;
-}
-.duo-cap .k {
-  font-family: var(--font-mono);
-  font-size: 9.5px;
-  letter-spacing: 0.11em;
-  text-transform: uppercase;
-  color: var(--ink-3);
-}
-.duo-cap .v { font-size: 13px; font-weight: 550; color: var(--ink); }
-
-/* iPhone frame */
-.phone {
-  position: relative;
-  width: min(300px, 100%);
-  aspect-ratio: 300 / 610;
-  border-radius: 42px;
-  padding: 9px;
-  background: linear-gradient(160deg, #232323, #0d0d0d 42%, #2c2c2c);
-  box-shadow:
-    0 1px 1px rgba(255, 255, 255, 0.4) inset,
-    0 0 0 1px rgba(25, 25, 25, 0.5),
-    0 26px 50px -22px rgba(25, 25, 25, 0.4);
-  z-index: 1;
-}
-
-.phone-screen {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  border-radius: 34px;
-  background: var(--paper);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  padding: 34px 13px 14px;
-  gap: 10px;
-}
-
-.phone-island {
-  position: absolute;
-  top: 12px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 74px;
-  height: 19px;
-  border-radius: 999px;
-  background: #0c0c0c;
-  z-index: 3;
-}
-
-.phone-status {
-  position: absolute;
-  top: 13px;
-  left: 22px;
-  right: 22px;
-  display: flex;
-  justify-content: space-between;
-  font-family: var(--font-mono);
-  font-size: 8.5px;
-  color: var(--ink-3);
-  z-index: 2;
-}
-
-/* screen 1: the swap, as a person uses it */
-.swap-mini { display: flex; flex-direction: column; gap: 8px; }
-
-.swap-mini .mini-title {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  margin-bottom: 2px;
-}
-.swap-mini .mini-title span {
-  display: block;
-  font-family: var(--font-mono);
-  font-size: 8px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--ink-3);
-  font-weight: 400;
-  margin-top: 3px;
-}
-
-.mini-leg {
-  background: var(--wash);
-  border: 1px solid var(--hair-soft);
-  border-radius: 13px;
-  padding: 9px 10px;
-}
-.mini-leg .k {
-  font-family: var(--font-mono);
-  font-size: 7.5px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--ink-3);
-}
-.mini-leg .row {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 8px;
-  margin-top: 3px;
-}
-.mini-leg .amt {
-  font-family: var(--font-mono);
-  font-size: 16px;
-  font-weight: 500;
-  letter-spacing: -0.03em;
-  font-variant-numeric: tabular-nums;
-}
-.mini-leg .tok {
-  font-family: var(--font-mono);
-  font-size: 9px;
-  color: var(--ink-2);
-  border: 1px solid var(--hair);
-  border-radius: 999px;
-  padding: 2px 7px;
-  background: var(--canvas);
-  white-space: nowrap;
-}
-
-.mini-hop {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  justify-content: center;
-  font-family: var(--font-mono);
-  font-size: 7.5px;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-  color: var(--ink-3);
-}
-.mini-hop i {
-  display: block;
-  width: 14px;
-  height: 1px;
-  background: var(--hair);
-}
-
-.mini-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  align-self: flex-start;
-  font-family: var(--font-mono);
-  font-size: 7.5px;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
-  color: var(--success);
-  background: var(--success-soft);
-  border: 1px solid rgba(47, 125, 81, 0.3);
-  border-radius: 999px;
-  padding: 3px 8px;
-}
-
-.mini-cta {
-  margin-top: auto;
-  background: rgba(25, 25, 25, 0.92);
-  color: var(--paper);
-  border: 1px solid rgba(25, 25, 25, 0.92);
-  border-radius: 999px;
-  text-align: center;
-  font-size: 11px;
-  font-weight: 550;
-  padding: 10px;
-}
-
-/* screen 2: the same trade, through an agent */
-.chat { display: flex; flex-direction: column; gap: 8px; }
-
-.bubble {
-  border-radius: 14px;
-  padding: 8px 10px;
-  font-size: 10.5px;
-  line-height: 1.45;
-  max-width: 92%;
-}
-.bubble.user {
-  align-self: flex-end;
-  background: rgba(25, 25, 25, 0.92);
-  color: var(--paper);
-  border-bottom-right-radius: 5px;
-}
-.bubble.agent {
-  align-self: flex-start;
-  background: var(--canvas);
-  border: 1px solid var(--hair-soft);
-  color: var(--ink);
-  border-bottom-left-radius: 5px;
-  box-shadow: 0 1px 2px rgba(25, 25, 25, 0.04);
-}
-.bubble.agent .mono {
-  display: block;
-  font-family: var(--font-mono);
-  font-size: 8.5px;
-  color: var(--ink-2);
-  margin-top: 5px;
-  line-height: 1.5;
-}
-.bubble .who {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-family: var(--font-mono);
-  font-size: 7.5px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--ink-3);
-  margin-bottom: 4px;
-}
-
-.agent-strip {
-  margin-top: auto;
-  border-top: 1px solid var(--hair-soft);
-  padding-top: 9px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-.agent-strip .k {
-  font-family: var(--font-mono);
-  font-size: 7.5px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--ink-3);
-}
-
-.agent-rows { display: flex; flex-direction: column; gap: 4px; }
-
-.agent-row {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  border: 1px solid var(--hair-soft);
-  border-radius: 9px;
-  padding: 5px 7px;
-  font-size: 9px;
-  color: var(--ink-2);
-  background: var(--canvas);
-}
-.agent-row .name { color: var(--ink); font-weight: 550; }
-.agent-row .dot {
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: var(--success);
-  margin-left: auto;
-  flex: none;
-  box-shadow: 0 0 0 3px var(--success-soft);
-}
-
-.duo-foot {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  color: var(--ink-3);
-  letter-spacing: 0.04em;
-  text-align: center;
-  margin-top: 22px;
-}
-
-@media (max-width: 900px) {
-  .duo { grid-template-columns: 1fr; }
-  .duo-card { padding: 18px; }
+@media (max-width: 600px) {
+  .duo-device { height: 400px; }
+  .duo-device-target { inset: 12% 4%; }
+  .hero-device-foot { font-size: 9px; }
 }

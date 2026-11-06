@@ -19,6 +19,10 @@ const config: HardhatUserConfig = {
       url: process.env.PORTALDOT_RPC || "https://test-evm-rpc-v3.portaldot.dev",
       chainId: 420420777,
       accounts,
+      // Portaldot's revive EVM uses weight-scaled gas. Transactions with a
+      // normal Ethereum gas limit are rejected as invalid, so pin the limit
+      // to the scale seen in accepted network transactions.
+      gas: 6_000_000_000_000,
     },
     sepolia: {
       url: process.env.SEPOLIA_RPC || "https://rpc.sepolia.org",

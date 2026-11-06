@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1120" viewBox="0 0 1600 1120">
+  <g font-family="Helvetica, Arial, sans-serif">
+    <text x="1470" y="78" text-anchor="end" fill="#ffffff" font-size="26" font-weight="600">9:41</text>
+
+    <rect x="820" y="120" width="700" height="880" rx="44" fill="#ffffff" fill-opacity="0.96" stroke="#e3ded3" stroke-width="2"/>
+
+    <text x="870" y="196" fill="#191919" font-family="Georgia, 'Times New Roman', serif" font-size="42" letter-spacing="-1.5">Hypersep</text>
+    <text x="1470" y="192" text-anchor="end" fill="#8d8d8d" font-family="ui-monospace, Menlo, monospace" font-size="14" letter-spacing="3">AGGREGATOR</text>
+
+    <text x="870" y="262" fill="#191919" font-family="Georgia, 'Times New Roman', serif" font-size="34" letter-spacing="-1">Live route</text>
+    <text x="872" y="294" fill="#8d8d8d" font-family="ui-monospace, Menlo, monospace" font-size="14" letter-spacing="2">SEPOLIA TO PORTALDOT · 3 ROUTES</text>
+
+    <rect x="870" y="330" width="600" height="150" rx="28" fill="#f5f4f1" stroke="#e9e5dc" stroke-width="1"/>
+    <text x="902" y="366" fill="#8d8d8d" font-family="ui-monospace, Menlo, monospace" font-size="13" letter-spacing="3">YOU PAY</text>
+    <text x="902" y="432" fill="#191919" font-family="ui-monospace, Menlo, monospace" font-size="46" letter-spacing="-2">100.00</text>
+    <rect x="1246" y="392" width="196" height="44" rx="22" fill="#ffffff" stroke="#e3ded3"/>
+    <text x="1344" y="421" text-anchor="middle" fill="#5b5b5b" font-family="ui-monospace, Menlo, monospace" font-size="16">mUSDC · Sepolia</text>
+
+    <line x1="920" y1="520" x2="1120" y2="520" stroke="#e3ded3" stroke-width="1"/>
+    <text x="1170" y="525" fill="#8d8d8d" font-family="ui-monospace, Menlo, monospace" font-size="12" letter-spacing="2">BRIDGE + SWAP · 10 BPS</text>
+    <line x1="1420" y1="520" x2="1520" y2="520" stroke="#e3ded3" stroke-width="1"/>
+
+    <rect x="870" y="560" width="600" height="150" rx="28" fill="#f5f4f1" stroke="#e9e5dc" stroke-width="1"/>
+    <text x="902" y="596" fill="#8d8d8d" font-family="ui-monospace, Menlo, monospace" font-size="13" letter-spacing="3">YOU RECEIVE</text>
+    <text x="902" y="662" fill="#191919" font-family="ui-monospace, Menlo, monospace" font-size="46" letter-spacing="-2">1,138.2</text>
+    <rect x="1246" y="622" width="196" height="44" rx="22" fill="#ffffff" stroke="#e3ded3"/>
+    <text x="1344" y="651" text-anchor="middle" fill="#5b5b5b" font-family="ui-monospace, Menlo, monospace" font-size="16">mPOT · Portaldot</text>
+
+    <rect x="870" y="740" width="248" height="40" rx="20" fill="#eaf1ec" stroke="#bcd4c5"/>
+    <circle cx="894" cy="760" r="5" fill="#2f7d51"/>
+    <text x="910" y="766" fill="#2f7d51" font-family="ui-monospace, Menlo, monospace" font-size="13" letter-spacing="2">CHEAPEST · ~5 MIN</text>
+
+    <rect x="870" y="820" width="600" height="90" rx="45" fill="#191919"/>
+    <text x="1170" y="874" text-anchor="middle" fill="#fbfaf5" font-family="Helvetica, Arial, sans-serif" font-size="22" font-weight="500">Execute route</text>
+
+    <text x="870" y="958" fill="#8d8d8d" font-family="ui-monospace, Menlo, monospace" font-size="12" letter-spacing="1">FEES $0.61 · GAS $0.50 · ETA ~5 MIN</text>
+  </g>
+</svg>

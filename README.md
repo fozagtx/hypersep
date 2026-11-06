@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="public/assets/logo.png" alt="Hypersep" width="320" />
+</p>
+
 # Hypersep - Cross-Chain Liquidity Aggregator
 
 Discover, compare, and execute the best swap routes across **Portaldot V3** and external EVM chains in one quote, instead of manually bridging, switching networks, and hunting pools.
@@ -70,6 +74,12 @@ hypersep/
 │       ├── bridge/relay/route.ts
 │       └── mcp/route.ts        # embedded MCP server (JSON-RPC 2.0)
 ├── components/                 # wallet button, route card, execution panel, marks
+│   ├── HeroDevice.tsx          # hero iPhone Duo (3D foldable device)
+│   └── iphone-duo/             # jal-co/iphone-duo component (MIT code)
+├── public/
+│   ├── assets/                 # logo.svg, logo.png, icon.svg, icon.png
+│   ├── hypersep/               # iPhone Duo screen artwork
+│   └── models/iphone-duo.glb   # Apple model, see THIRD_PARTY.md
 ├── hooks/useWallet.ts          # EIP-1193 injected wallet state
 ├── lib/
 │   ├── chains.ts abis.ts execution.ts types.ts
@@ -188,4 +198,5 @@ Hypersep's route graph is chain-agnostic, but its **settlement hub is Portaldot*
 
 ## License
 
-MIT. See `LICENSE`.
+MIT. See `LICENSE`. The iPhone Duo component code is MIT by jal-co. The Apple 3D model and its
+textures are excluded from the MIT license; see `THIRD_PARTY.md` before redistributing.

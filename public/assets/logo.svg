@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="320" viewBox="0 0 1200 320">
+  <g transform="translate(48 80) scale(5)" fill="none">
+    <path d="M5 24h8.4c2.6 0 4.1-1.6 4.1-4.2v-4.6c0-2.5 1.5-4.2 4.1-4.2H29"
+      stroke="#191919" stroke-width="2.5" stroke-linecap="round"/>
+    <circle cx="5" cy="24" r="2.9" fill="#191919"/>
+    <circle cx="29" cy="11" r="2.9" fill="#191919"/>
+    <circle cx="17.5" cy="17.5" r="1.9" fill="#191919" fill-opacity="0.45"/>
+  </g>
+  <text x="248" y="208" fill="#191919"
+    font-family="Georgia, 'Times New Roman', serif" font-size="150" letter-spacing="-6">Hypersep</text>
+</svg>

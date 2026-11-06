@@ -22,24 +22,34 @@ async function main() {
 
   const txHashes: Record<string, string> = {};
 
+  // Portaldot's revive EVM uses weight-scaled gas and only accepts EIP-1559
+  // transactions with a very large gas limit. Build fresh overrides from the
+  // current base fee for every transaction.
+  const GAS_LIMIT = 20_000_000_000_000n;
+  async function overrides() {
+    const block = await ethers.provider.getBlock("latest");
+    const base = block?.baseFeePerGas ?? 21220n;
+    return { gasLimit: GAS_LIMIT, maxFeePerGas: base * 2n, maxPriorityFeePerGas: 0n };
+  }
+
   // 1. Tokens
   const Token = await ethers.getContractFactory("TestERC20");
-  const usdc = await Token.deploy("Mock USD Coin", "mUSDC", 18, ethers.parseEther("10000000"));
+  const usdc = await Token.deploy("Mock USD Coin", "mUSDC", 18, ethers.parseEther("10000000"), await overrides());
   await usdc.waitForDeployment();
   txHashes.usdcDeploy = usdc.deploymentTransaction()!.hash;
 
-  const pot = await Token.deploy("Mock POT", "mPOT", 18, ethers.parseEther("100000000"));
+  const pot = await Token.deploy("Mock POT", "mPOT", 18, ethers.parseEther("100000000"), await overrides());
   await pot.waitForDeployment();
   txHashes.potDeploy = pot.deploymentTransaction()!.hash;
 
   // 2. AMM
   const Factory = await ethers.getContractFactory("Factory");
-  const factory = await Factory.deploy();
+  const factory = await Factory.deploy(await overrides());
   await factory.waitForDeployment();
   txHashes.factoryDeploy = factory.deploymentTransaction()!.hash;
 
   const Router = await ethers.getContractFactory("Router");
-  const router = await Router.deploy(await factory.getAddress());
+  const router = await Router.deploy(await factory.getAddress(), await overrides());
   await router.waitForDeployment();
   txHashes.routerDeploy = router.deploymentTransaction()!.hash;
 
@@ -51,15 +61,15 @@ async function main() {
   const pairAddresses: Record<string, string> = {};
 
   for (const p of pools) {
-    const createTx = await factory.createPair(await usdc.getAddress(), await pot.getAddress(), p.feeBps);
+    const createTx = await factory.createPair(await usdc.getAddress(), await pot.getAddress(), p.feeBps, await overrides());
     await createTx.wait();
     txHashes[`createPair${p.feeBps}`] = createTx.hash;
 
     const pairAddr: string = await factory.getPair(await usdc.getAddress(), await pot.getAddress(), p.feeBps);
     pairAddresses[`USDC/POT@${p.feeBps}`] = pairAddr;
 
-    await (await usdc.approve(await router.getAddress(), p.usdcLiq)).wait();
-    await (await pot.approve(await router.getAddress(), p.potLiq)).wait();
+    await (await usdc.approve(await router.getAddress(), p.usdcLiq, await overrides())).wait();
+    await (await pot.approve(await router.getAddress(), p.potLiq, await overrides())).wait();
     const addTx = await router.addLiquidity(
       await usdc.getAddress(),
       await pot.getAddress(),
@@ -69,7 +79,8 @@ async function main() {
       0,
       0,
       deployer.address,
-      Math.floor(Date.now() / 1000) + 3600
+      Math.floor(Date.now() / 1000) + 3600,
+      await overrides()
     );
     await addTx.wait();
     txHashes[`addLiquidity${p.feeBps}`] = addTx.hash;
@@ -79,16 +90,16 @@ async function main() {
   // 4. Bridge (testnet relayer = deployer unless RELAYER_ADDRESS is set)
   const relayerAddress = process.env.RELAYER_ADDRESS || deployer.address;
   const Bridge = await ethers.getContractFactory("HypersepBridge");
-  const bridge = await Bridge.deploy(relayerAddress);
+  const bridge = await Bridge.deploy(relayerAddress, await overrides());
   await bridge.waitForDeployment();
   txHashes.bridgeDeploy = bridge.deploymentTransaction()!.hash;
 
-  await (await bridge.setSupportedToken(await usdc.getAddress(), true)).wait();
-  await (await bridge.setSupportedToken(await pot.getAddress(), true)).wait();
+  await (await bridge.setSupportedToken(await usdc.getAddress(), true, await overrides())).wait();
+  await (await bridge.setSupportedToken(await pot.getAddress(), true, await overrides())).wait();
 
   // destination-side liquidity so releases succeed immediately
-  await (await usdc.mint(await bridge.getAddress(), ethers.parseEther("500000"))).wait();
-  await (await pot.mint(await bridge.getAddress(), ethers.parseEther("6250000"))).wait();
+  await (await usdc.mint(await bridge.getAddress(), ethers.parseEther("500000"), await overrides())).wait();
+  await (await pot.mint(await bridge.getAddress(), ethers.parseEther("6250000"), await overrides())).wait();
   console.log(`Bridge: ${await bridge.getAddress()} (relayer ${relayerAddress})`);
 
   // 5. Persist for the quote engine + frontend execution

@@ -1,15 +1,21 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import dynamic from "next/dynamic";
 import { useWallet } from "@/hooks/useWallet";
 import type { Address } from "viem";
 import { ConnectButton } from "@/components/ConnectButton";
 import { RouteCard } from "@/components/RouteCard";
 import { ExecutionPanel } from "@/components/ExecutionPanel";
-import { HypersepMark, PortaldotMark, ClaudeMark, OpenAIMark } from "@/components/logos";
+import { HypersepMark, PortaldotMark } from "@/components/logos";
 import { RevealObserver } from "@/components/Reveal";
 import { buildFaucetAction, sendWalletTx } from "@/lib/execution";
 import type { ApiQuote, ApiRoute, DeploymentMap } from "@/lib/types";
+
+const HeroDevice = dynamic(() => import("@/components/HeroDevice").then((m) => m.HeroDevice), {
+  ssr: false,
+  loading: () => <div className="hero-device hero-device--loading" />,
+});
 
 const CHAIN_OPTIONS = [
   { value: "11155111", label: "Ethereum Sepolia" },
@@ -118,25 +124,29 @@ export default function Home() {
 
       <section className="hero">
         <div className="hero-inner">
-          <h1 className="blur-in">
-            Every chain,
-            <br />
-            one best route.
-          </h1>
-          <p className="sub blur-in d1">
-            Hypersep is an AI-first exchange and trade aggregator. Describe the trade, and it reads
-            every pool and bridge, prices the whole path, and settles it across Portaldot and EVM
-            chains.
-          </p>
-          <div className="hero-actions blur-in d2">
-            <button className="btn btn-green" onClick={getRoutes} disabled={loading}>
-              {loading ? "Routing…" : "Find best route"}
-            </button>
-            <button className="btn btn-outline" onClick={faucet} disabled={!isConnected}>
-              Get test tokens
-            </button>
+          <div className="hero-copy">
+            <h1 className="blur-in">
+              Every chain,
+              <br />
+              one best route.
+            </h1>
+            <p className="sub blur-in d1">
+              Hypersep is an AI-first exchange and trade aggregator. Describe the trade, and it
+              reads every pool and bridge, prices the whole path, and settles it across Portaldot
+              and EVM chains.
+            </p>
+            <div className="hero-actions blur-in d2">
+              <button className="btn btn-green" onClick={getRoutes} disabled={loading}>
+                {loading ? "Routing…" : "Find best route"}
+              </button>
+              <button className="btn btn-outline" onClick={faucet} disabled={!isConnected}>
+                Get test tokens
+              </button>
+            </div>
+            {faucetState && <p className="footer-note">{faucetState}</p>}
           </div>
-          {faucetState && <p className="footer-note">{faucetState}</p>}
+
+          <HeroDevice />
         </div>
       </section>
 
@@ -259,115 +269,6 @@ export default function Home() {
             <p className="warning" style={{ marginTop: 20 }}>Connect your wallet to execute this route.</p>
           )}
         </div>
-      </section>
-
-      <section className="duo-section reveal" id="access">
-        <h2>One aggregator, two front doors</h2>
-        <p className="lead">
-          The route engine is the same either way. Quote it yourself in the app, or let an agent
-          quote it over MCP and execute the path it picks.
-        </p>
-
-        <div className="duo">
-          <div className="duo-card">
-            <div className="duo-cap">
-              <span className="k">In the app</span>
-              <span className="v">You trade</span>
-            </div>
-            <div className="phone">
-              <div className="phone-island" aria-hidden="true" />
-              <div className="phone-screen">
-                <div className="phone-status">
-                  <span>9:41</span>
-                  <span>Hypersep</span>
-                </div>
-                <div className="swap-mini">
-                  <div className="mini-title">
-                    Swap
-                    <span>Best route across every venue</span>
-                  </div>
-                  <div className="mini-leg">
-                    <div className="k">You pay</div>
-                    <div className="row">
-                      <span className="amt">100.00</span>
-                      <span className="tok">mUSDC · Sepolia</span>
-                    </div>
-                  </div>
-                  <div className="mini-hop">
-                    <i />
-                    bridge + swap · 30 bps
-                    <i />
-                  </div>
-                  <div className="mini-leg">
-                    <div className="k">You receive</div>
-                    <div className="row">
-                      <span className="amt">1,238.4</span>
-                      <span className="tok">mPOT · Portaldot</span>
-                    </div>
-                  </div>
-                  <span className="mini-pill">Best overall · ~6s</span>
-                </div>
-                <div className="mini-cta">Execute route</div>
-              </div>
-            </div>
-          </div>
-
-          <div className="duo-card">
-            <div className="duo-cap">
-              <span className="k">In your agent</span>
-              <span className="v">MCP connected</span>
-            </div>
-            <div className="phone">
-              <div className="phone-island" aria-hidden="true" />
-              <div className="phone-screen">
-                <div className="phone-status">
-                  <span>9:41</span>
-                  <span>Agent</span>
-                </div>
-                <div className="chat">
-                  <div className="bubble user">
-                    Cheapest route for 100 mUSDC on Sepolia into mPOT on Portaldot?
-                  </div>
-                  <div className="bubble agent">
-                    <span className="who">
-                      <ClaudeMark size={10} /> Claude · hypersep_quote
-                    </span>
-                    Three routes. Cheapest is bridge then the 10 bps pool — best output, $0.61 in
-                    fees.
-                    <span className="mono">
-                      simbridge-sepolia-portaldot → miniamm-420420777-10bps
-                    </span>
-                  </div>
-                </div>
-                <div className="agent-strip">
-                  <span className="k">Connected agents</span>
-                  <div className="agent-rows">
-                    <div className="agent-row">
-                      <ClaudeMark size={12} />
-                      <span className="name">Claude Code</span>
-                      <span>/api/mcp</span>
-                      <span className="dot" />
-                    </div>
-                    <div className="agent-row">
-                      <OpenAIMark size={12} />
-                      <span className="name">ChatGPT</span>
-                      <span>/api/mcp</span>
-                      <span className="dot" />
-                    </div>
-                    <div className="agent-row">
-                      <OpenAIMark size={12} />
-                      <span className="name">Codex</span>
-                      <span>/api/mcp</span>
-                      <span className="dot" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <p className="duo-foot">Same engine, same quote — the phone is only a viewport.</p>
       </section>
 
       <section className="light" id="highlights">
