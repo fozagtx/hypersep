@@ -102,6 +102,51 @@ export default function Home() {
         <div className="light-inner reveal">
           <h2>How the router scores a path</h2>
           <div className="bento">
+            <div className="cell cell-flow">
+              <div className="flow">
+                <svg viewBox="0 0 400 300" preserveAspectRatio="none" aria-hidden="true">
+                  <path className="flow-line" d="M200 150 C 150 150 120 100 55 74" />
+                  <path className="flow-line" d="M200 150 C 250 150 280 100 345 74" />
+                  <path className="flow-line" d="M200 150 C 150 150 120 200 55 226" />
+                  <path className="flow-line" d="M200 150 C 250 150 280 200 345 226" />
+                  <path className="flow-line" d="M200 150 L 200 34" />
+                  <path className="flow-line" d="M200 150 L 200 266" />
+                  <path className="flow-hot" d="M200 150 C 150 150 120 100 55 74" />
+                  <path className="flow-hot" d="M200 150 C 250 150 280 200 345 226" />
+                </svg>
+
+                <div className="flow-center">
+                  <span className="orb"><HypersepMark size={28} /></span>
+                  <em>Hypersep</em>
+                </div>
+
+                <div className="flow-node" style={{ left: "4%", top: "12%" }}>
+                  <span className="orb"><PortaldotMark size={18} /></span>
+                  <em>Portaldot</em>
+                </div>
+                <div className="flow-node" style={{ right: "4%", top: "12%" }}>
+                  <span className="orb"><EthereumMark size={18} /></span>
+                  <em>Sepolia</em>
+                </div>
+                <div className="flow-node" style={{ left: "4%", bottom: "12%" }}>
+                  <span className="orb"><ClaudeMark size={16} /></span>
+                  <em>Claude</em>
+                </div>
+                <div className="flow-node" style={{ right: "4%", bottom: "12%" }}>
+                  <span className="orb"><OpenAIMark size={16} /></span>
+                  <em>ChatGPT</em>
+                </div>
+                <div className="flow-node" style={{ left: "50%", top: "0%", transform: "translateX(-50%)" }}>
+                  <span className="orb flow-mono">30</span>
+                  <em>bps pool</em>
+                </div>
+                <div className="flow-node" style={{ left: "50%", bottom: "0%", transform: "translateX(-50%)" }}>
+                  <span className="orb flow-mono">10</span>
+                  <em>bps pool</em>
+                </div>
+              </div>
+            </div>
+
             <div className="cell">
               <div className="big">Top 3</div>
               <p className="small">Routes ranked on every quote. <span className="tick">Best output, cheapest, fastest.</span></p>

@@ -1031,3 +1031,143 @@ input { width: 130px; }
   margin-top: 4px;
 }
 .agent-docs-note { color: var(--faint); font-size: 13px; margin-top: 24px; }
+
+/* ------------------------------------------------------- hero device entrance */
+.hero-duo {
+  animation: duo-enter 1.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+  transform-style: preserve-3d;
+}
+@keyframes duo-enter {
+  0% {
+    opacity: 0;
+    transform: perspective(1400px) rotateY(-38deg) translateX(26px) scale(0.95);
+    filter: blur(6px);
+  }
+  100% {
+    opacity: 1;
+    transform: perspective(1400px) rotateY(0deg) translateX(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+/* ------------------------------------------------------------ flow bento */
+.cell-flow {
+  grid-column: span 2;
+  grid-row: span 2;
+  padding: 10px;
+  min-height: 340px;
+}
+.flow {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 320px;
+}
+.flow svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.flow-line {
+  fill: none;
+  stroke: rgba(25, 25, 25, 0.16);
+  stroke-width: 1.2;
+  stroke-dasharray: 4 7;
+  animation: flow-dash 4s linear infinite;
+}
+.flow-hot {
+  fill: none;
+  stroke: rgba(25, 25, 25, 0.65);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-dasharray: 10 150;
+  filter: drop-shadow(0 0 4px rgba(25, 25, 25, 0.45));
+  animation: flow-travel 2.8s linear infinite;
+}
+@keyframes flow-dash { to { stroke-dashoffset: -44; } }
+@keyframes flow-travel { to { stroke-dashoffset: -160; } }
+
+.flow-center {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  z-index: 2;
+}
+.flow-center .orb {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: var(--ink);
+  color: var(--paper);
+  display: grid;
+  place-items: center;
+  box-shadow: 0 0 0 8px rgba(25, 25, 25, 0.06), 0 0 30px rgba(25, 25, 25, 0.22);
+  animation: orb-breathe 3.2s ease-in-out infinite;
+}
+.flow-center .orb svg { color: var(--paper); }
+.flow-center em {
+  font-style: normal;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.flow-node {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  z-index: 2;
+}
+.flow-node .orb {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--canvas);
+  border: 1px solid var(--hair);
+  display: grid;
+  place-items: center;
+  box-shadow: 0 4px 14px -6px rgba(25, 25, 25, 0.25);
+  animation: orb-glow 3.6s ease-in-out infinite;
+}
+.flow-node em {
+  font-style: normal;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+.flow-mono {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+}
+@keyframes orb-breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+@keyframes orb-glow {
+  0%, 100% { box-shadow: 0 4px 14px -6px rgba(25, 25, 25, 0.25); }
+  50% { box-shadow: 0 0 0 6px rgba(25, 25, 25, 0.05), 0 4px 18px -6px rgba(25, 25, 25, 0.3); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-duo { animation: none; }
+  .flow-line, .flow-hot, .flow-center .orb, .flow-node .orb { animation: none; }
+}
+@media (max-width: 900px) {
+  .cell-flow { grid-column: span 2; grid-row: auto; min-height: 320px; }
+}
+@media (max-width: 620px) {
+  .cell-flow { grid-column: span 1; min-height: 300px; }
+}

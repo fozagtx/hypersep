@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { useWallet } from "@/hooks/useWallet";
 import { CHAINS_BY_ID } from "@/lib/chains";
 import { EthereumMark, PortaldotMark } from "@/components/logos";
@@ -10,6 +10,17 @@ export function ConnectButton() {
   const { address, isConnected, chainId, connect, disconnect, switchChain } = useWallet();
   const [connecting, setConnecting] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
+
+  // On a fresh manual connect, or when a previously authorized wallet
+  // auto-reconnects on page load, land on the dashboard once per session.
+  // After that the logo or Home link can return to the landing without bouncing.
+  useEffect(() => {
+    if (!isConnected || pathname !== "/") return;
+    if (sessionStorage.getItem("hypersep:redirected")) return;
+    sessionStorage.setItem("hypersep:redirected", "1");
+    router.push("/dashboard");
+  }, [isConnected, pathname, router]);
 
   if (!isConnected || !address) {
     return (
@@ -20,7 +31,6 @@ export function ConnectButton() {
             setConnecting(true);
             try {
               await connect();
-              router.push("/dashboard");
             } catch {
               /* user rejected or no wallet */
             } finally {
@@ -58,7 +68,13 @@ export function ConnectButton() {
       <span className="badge-addr">
         {address.slice(0, 6)}…{address.slice(-4)}
       </span>
-      <button className="chip-btn" onClick={() => disconnect()}>
+      <button
+        className="chip-btn"
+        onClick={() => {
+          sessionStorage.removeItem("hypersep:redirected");
+          disconnect();
+        }}
+      >
         Disconnect
       </button>
     </div>
