@@ -1,103 +1,17 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
-import { useWallet } from "@/hooks/useWallet";
-import type { Address } from "viem";
 import { ConnectButton } from "@/components/ConnectButton";
-import { RouteCard } from "@/components/RouteCard";
-import { ExecutionPanel } from "@/components/ExecutionPanel";
-import { HypersepMark, PortaldotMark, EthereumMark } from "@/components/logos";
+import { HypersepMark, PortaldotMark, EthereumMark, ClaudeMark, OpenAIMark } from "@/components/logos";
 import { RevealObserver } from "@/components/Reveal";
-import { buildFaucetAction, sendWalletTx } from "@/lib/execution";
-import type { ApiQuote, ApiRoute, DeploymentMap } from "@/lib/types";
+import { McpEndpoint } from "@/components/McpEndpoint";
 
 const HeroDevice = dynamic(() => import("@/components/HeroDevice").then((m) => m.HeroDevice), {
   ssr: false,
   loading: () => <div className="hero-device hero-device--loading" />,
 });
 
-const CHAIN_OPTIONS = [
-  { value: "11155111", label: "Ethereum Sepolia" },
-  { value: "420420777", label: "Portaldot V3 Testnet" },
-];
-
-const TOKEN_OPTIONS = ["mUSDC", "mPOT"];
-
 export default function Home() {
-  const { address, isConnected, connect } = useWallet();
-
-  const [fromChain, setFromChain] = useState("11155111");
-  const [fromToken, setFromToken] = useState("mUSDC");
-  const [toChain, setToChain] = useState("420420777");
-  const [toToken, setToToken] = useState("mPOT");
-  const [amountIn, setAmountIn] = useState("100");
-
-  const [loading, setLoading] = useState(false);
-  const [quote, setQuote] = useState<ApiQuote | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [selectedRoute, setSelectedRoute] = useState<ApiRoute | null>(null);
-  const [deployments, setDeployments] = useState<DeploymentMap>({});
-  const [faucetState, setFaucetState] = useState<string | null>(null);
-
-  const swapRef = useRef<HTMLDivElement | null>(null);
-  const wasConnected = useRef(false);
-
-  // On wallet connect, land the user on the swap card instead of leaving them
-  // parked on the marketing surface.
-  useEffect(() => {
-    if (isConnected && !wasConnected.current) {
-      wasConnected.current = true;
-      swapRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
-    }
-    if (!isConnected) wasConnected.current = false;
-  }, [isConnected]);
-
-  useEffect(() => {
-    fetch("/api/deployments")
-      .then((r) => r.json())
-      .then((d) => setDeployments(d.deployments ?? {}))
-      .catch(() => setDeployments({}));
-  }, []);
-
-  async function getRoutes() {
-    setLoading(true);
-    setError(null);
-    setQuote(null);
-    setSelectedRoute(null);
-    try {
-      const qs = new URLSearchParams({ fromChain, fromToken, toChain, toToken, amountIn });
-      const res = await fetch(`/api/quote?${qs}`);
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Quote failed");
-      const q = data as ApiQuote;
-      setQuote(q);
-      if (q.routes?.length) setSelectedRoute(q.routes[0]);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Quote failed");
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function faucet() {
-    if (!address || !isConnected) return;
-    const chainTokens = deployments[fromChain]?.tokens;
-    const tokenAddr = chainTokens?.[fromToken] as Address | undefined;
-    if (!tokenAddr) {
-      setFaucetState("Token not deployed yet - run the deploy script first.");
-      return;
-    }
-    setFaucetState("Confirm in your wallet…");
-    try {
-      const action = buildFaucetAction(tokenAddr, fromToken, address);
-      const hash = await sendWalletTx(action, Number(fromChain), address);
-      setFaucetState(`Minted 1,000 ${fromToken} - tx ${hash.slice(0, 10)}…`);
-    } catch (e) {
-      setFaucetState(`Faucet failed: ${e instanceof Error ? e.message : "unknown error"}`);
-    }
-  }
-
   return (
     <>
       <RevealObserver />
@@ -113,31 +27,29 @@ export default function Home() {
           <span>Hypersep</span>
         </a>
         <div className="wh-right">
-          <a className="wh-link" href="#swap">Swap</a>
+          <a className="wh-link" href="/dashboard">Swap</a>
+          <a className="wh-link" href="#about">About</a>
           <a className="wh-link" href="#faq">FAQs</a>
           <ConnectButton />
         </div>
       </header>
 
-      {!isConnected && (
-        <>
       <section className="hero">
         <div className="hero-inner">
           <div className="hero-copy">
             <h1 className="blur-in">
-              Every chain,
+              Two chains.
               <br />
-              one best route.
+              One ranked route.
             </h1>
             <p className="sub blur-in d1">
-              Hypersep is an AI-first exchange and trade aggregator. Describe the trade, and it
-              reads every pool and bridge, prices the whole path, and settles it across Portaldot
-              and EVM chains.
+              Hypersep compares MiniAMM pools on Portaldot V3 and Sepolia plus bridge paths. You see
+              fees, gas, price impact and ETA for the whole route before you sign.
             </p>
             <div className="hero-actions blur-in d2">
-              <button className="btn btn-green" onClick={() => connect()}>
-                Connect wallet
-              </button>
+              <a className="btn btn-green" href="/dashboard">
+                Launch dashboard
+              </a>
               <a className="btn btn-outline" href="/docs">
                 Read the docs
               </a>
@@ -164,187 +76,86 @@ export default function Home() {
           <span className="venue">Hypersep Bridge</span>
         </div>
       </div>
-        </>
-      )}
 
-      {isConnected && (
-      <section className="wrap" id="swap">
-        <div className="dashboard-head">
-          <div>
-            <p className="label">Dashboard</p>
-            <h1>Trade across chains</h1>
-            <p className="sub">
-              {address ? `${address.slice(0, 6)}…${address.slice(-4)}` : "Wallet connected"}. One
-              quote, every venue, ranked by total cost.
-            </p>
+      <section className="about-section reveal" id="about">
+        <div className="light-inner">
+          <h2>About Hypersep</h2>
+          <p className="lead">
+            Hypersep is a testnet prototype for the Portaldot Hacker House. It quotes MiniAMM pools
+            at 30 and 10 bps on Portaldot V3 and Sepolia, plus a simulated bridge, and ranks the
+            whole path by output, fees, gas, price impact, ETA and bridge risk.
+          </p>
+
+          <div className="agents-strip">
+            <div className="agent-logos">
+              <span><ClaudeMark size={18} /> Claude</span>
+              <span><OpenAIMark size={18} /> ChatGPT</span>
+              <span>Codex</span>
+            </div>
+            <McpEndpoint />
+            <a className="btn btn-outline btn-sm" href="/docs">Agent setup</a>
           </div>
-          <button className="chip-btn" onClick={faucet}>
-            Get test tokens
-          </button>
-        </div>
-        {faucetState && <p className="footer-note">{faucetState}</p>}
-        <div className="dashboard-grid">
-        <div className="swap-card" ref={swapRef}>
-          <div className="panel-head">
-            <h2>Find a route</h2>
-            <span className="tag">Sepolia to Portaldot</span>
-          </div>
-
-          <div className="leg">
-            <div>
-              <label className="label">You pay - Chain</label>
-              <select value={fromChain} onChange={(e) => setFromChain(e.target.value)}>
-                {CHAIN_OPTIONS.map((c) => (
-                  <option key={c.value} value={c.value}>{c.label}</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="label">Token</label>
-              <select value={fromToken} onChange={(e) => setFromToken(e.target.value)}>
-                {TOKEN_OPTIONS.map((t) => (
-                  <option key={t} value={t}>{t}</option>
-                ))}
-              </select>
-            </div>
-            <div className="grow">
-              <label className="label">Amount</label>
-              <input value={amountIn} onChange={(e) => setAmountIn(e.target.value)} inputMode="decimal" />
-            </div>
-          </div>
-
-          <div className="leg-divider">
-            <span className="leg-arrow">↓</span>
-          </div>
-
-          <div className="leg">
-            <div>
-              <label className="label">You receive - Chain</label>
-              <select value={toChain} onChange={(e) => setToChain(e.target.value)}>
-                {CHAIN_OPTIONS.map((c) => (
-                  <option key={c.value} value={c.value}>{c.label}</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="label">Token</label>
-              <select value={toToken} onChange={(e) => setToToken(e.target.value)}>
-                {TOKEN_OPTIONS.map((t) => (
-                  <option key={t} value={t}>{t}</option>
-                ))}
-              </select>
-            </div>
-            <div className="grow" style={{ textAlign: "right" }}>
-              <button className="btn btn-white" onClick={getRoutes} disabled={loading} style={{ width: "100%" }}>
-                {loading ? "Routing…" : "Find best route"}
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div className="dashboard-results">
-          {error && <p className="warning">{error}</p>}
-          {quote?.warnings.map((w) => (
-            <p key={w} className="warning">{w}</p>
-          ))}
-
-          {quote && quote.routes.length > 0 && (
-            <>
-              <div className="routes-head">
-                <h2>{quote.routes.length} routes found</h2>
-                <span className="routes-count">ranked by total cost - {fromToken} to {toToken}</span>
-              </div>
-              {quote.routes.map((r, i) => (
-                <RouteCard
-                  key={i}
-                  route={r}
-                  toToken={toToken}
-                  selected={selectedRoute === r}
-                  onSelect={() => setSelectedRoute(r)}
-                />
-              ))}
-              <p className="footer-note">Price source: {quote.priceSource}</p>
-            </>
-          )}
-
-          {!quote && !error && (
-            <div className="empty" style={{ marginTop: 18 }}>
-              Enter an amount and press Find best route. Every venue and bridge path gets ranked.
-            </div>
-          )}
-
-          {selectedRoute && isConnected && address && !quote?.demo && (
-            <div style={{ marginTop: 24 }}>
-              <ExecutionPanel route={selectedRoute} deployments={deployments} userAddress={address} />
-            </div>
-          )}
-          {selectedRoute && !isConnected && !quote?.demo && (
-            <p className="warning" style={{ marginTop: 20 }}>Connect your wallet to execute this route.</p>
-          )}
-        </div>
         </div>
       </section>
-      )}
 
-      {!isConnected && (
-        <>
       <section className="light" id="highlights">
         <div className="light-inner reveal">
-          <h2>Routing that reads the whole market, not one pool</h2>
+          <h2>How the router scores a path</h2>
           <div className="bento">
             <div className="cell">
               <div className="big">Top 3</div>
-              <p className="small">Routes ranked on every quote. <span className="tick">Best, cheapest, fastest.</span></p>
+              <p className="small">Routes ranked on every quote. <span className="tick">Best output, cheapest, fastest.</span></p>
             </div>
             <div className="cell">
-              <div className="big">Guaranteed quote</div>
-              <p className="small">Execute at the price you see. Slippage guard at 0.5%.</p>
+              <div className="big">On-chain quote</div>
+              <p className="small">Quotes read pool reserves from the chain, not a cached price.</p>
             </div>
             <div className="cell">
               <div className="big">2 venues</div>
               <p className="small">MiniAMM pools at 30 bps and 10 bps on Portaldot V3 testnet.</p>
             </div>
             <div className="cell">
-              <div className="big">Multi-chain</div>
+              <div className="big">Two chains</div>
               <p className="small">Sepolia and Portaldot V3 testnet in one route graph.</p>
             </div>
             <div className="cell">
-              <div className="big">100ms</div>
-              <p className="small"><span className="tick">Quote response.</span> Venues polled in parallel.</p>
+              <div className="big">Parallel quotes</div>
+              <p className="small">Every venue is queried at once, then the engine ranks the full path.</p>
             </div>
             <div className="cell">
-              <div className="big">99.9%</div>
-              <p className="small">Uptime target. Always on, testnet first.</p>
+              <div className="big">Testnet first</div>
+              <p className="small">Built and tested on Portaldot V3 testnet, chainId 420420777.</p>
             </div>
             <div className="cell">
               <div className="big">Bridge + swap</div>
-              <p className="small">Lock on one chain, release and swap on the next.</p>
+              <p className="small">A simulated bridge plus a swap on the destination chain.</p>
             </div>
             <div className="cell">
-              <div className="big">Multi-token</div>
-              <p className="small">mUSDC and mPOT on both chains today, more next.</p>
+              <div className="big">Two tokens</div>
+              <p className="small">mUSDC and mPOT on both chains today.</p>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="features reveal" id="api">          <h2>An aggregator API built for agents</h2>
+      <section className="features reveal" id="api">
+        <h2>The same engine over HTTP and MCP</h2>
         <p className="lead">
-          Aggregator API. Designed for best execution. Ranked routes with fees, gas, price impact
-          and settlement time on every response.
+          `GET /api/quote` returns the ranked routes. `POST /api/mcp` exposes the same tools to
+          Claude, ChatGPT, or any MCP client. No API key for reads.
         </p>
         <div className="feat-grid">
           <div className="feat">
-            <h3>Speed boosting</h3>
-            <p>Venues quote in parallel. Land onchain faster than manual bridging.</p>
+            <h3>Parallel venue quotes</h3>
+            <p>Each AMM pool and bridge adapter is queried at once, then the engine ranks full paths.</p>
           </div>
           <div className="feat">
-            <h3>Optimized for price</h3>
-            <p>Fees, gas, impact and bridge risk scored together. Perfect when price matters most.</p>
+            <h3>Cost-ranked routes</h3>
+            <p>Output, fees, gas, price impact, ETA and bridge risk are scored together, not one at a time.</p>
           </div>
           <div className="feat">
-            <h3>Flexible fills</h3>
-            <p>Request one amount. Compare every path. Your trades, your call.</p>
+            <h3>One request, every path</h3>
+            <p>The engine enumerates routes up to 3 steps with at most one bridge and two swaps.</p>
           </div>
         </div>
       </section>
@@ -363,14 +174,16 @@ export default function Home() {
           <strong>How is Hypersep different?</strong>
           <span>It ranks complete routes, not single pools. Bridge cost, swap fees, slippage and ETA are compared before you sign.</span>
         </div>
+        <div className="faq-item">
+          <strong>Are the contracts deployed?</strong>
+          <span>Not yet. Until the Portaldot deploy is funded, the app uses seeded demo liquidity and labels it in the quote response.</span>
+        </div>
       </section>
-        </>
-      )}
 
       <footer className="footer">
         <span>Hypersep - Cross-chain liquidity aggregator - Testnet prototype</span>
         <span>
-          <a href="#swap">Swap</a> · <a href="#faq">FAQs</a>
+          <a href="/dashboard">Swap</a> · <a href="#faq">FAQs</a>
         </span>
       </footer>
     </>

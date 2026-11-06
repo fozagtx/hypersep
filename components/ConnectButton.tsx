@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useWallet } from "@/hooks/useWallet";
 import { CHAINS_BY_ID } from "@/lib/chains";
 import { EthereumMark, PortaldotMark } from "@/components/logos";
@@ -8,6 +9,7 @@ import { EthereumMark, PortaldotMark } from "@/components/logos";
 export function ConnectButton() {
   const { address, isConnected, chainId, connect, disconnect, switchChain } = useWallet();
   const [connecting, setConnecting] = useState(false);
+  const router = useRouter();
 
   if (!isConnected || !address) {
     return (
@@ -18,6 +20,7 @@ export function ConnectButton() {
             setConnecting(true);
             try {
               await connect();
+              router.push("/dashboard");
             } catch {
               /* user rejected or no wallet */
             } finally {
