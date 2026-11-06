@@ -245,6 +245,10 @@ export function TradeDashboard() {
             </div>
           ))
         )}
+
+        <div className="contracts-link">
+          <a className="btn btn-outline btn-sm" href="/contracts">Contract details</a>
+        </div>
       </section>
     </>
   );

@@ -1295,3 +1295,32 @@ input { width: 130px; }
 @media (max-width: 640px) {
   .contract-grid { grid-template-columns: 1fr; }
 }
+
+/* ------------------------------------------------------ contract details */
+.contracts-page .contract-table {
+  margin: 18px 0;
+  border: 1px solid var(--hair-soft);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.contract-table-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--hair-soft);
+  font-size: 13px;
+}
+.contract-table-row:last-child { border-bottom: none; }
+.contract-table-row > span { color: var(--ink-3); flex: none; }
+.contract-table-row strong { font-weight: 550; }
+.contract-table-row code {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  word-break: break-all;
+  text-align: right;
+}
+.contract-table-row a { color: var(--ink); text-decoration: none; border-bottom: 1px solid var(--hair); }
+.contract-desc { margin-top: 6px; color: var(--ink-3); font-size: 12px; }
+.contracts-link { margin-top: 14px; }
