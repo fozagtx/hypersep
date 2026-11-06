@@ -7,7 +7,7 @@ import type { Address } from "viem";
 import { ConnectButton } from "@/components/ConnectButton";
 import { RouteCard } from "@/components/RouteCard";
 import { ExecutionPanel } from "@/components/ExecutionPanel";
-import { HypersepMark, PortaldotMark } from "@/components/logos";
+import { HypersepMark, PortaldotMark, EthereumMark } from "@/components/logos";
 import { RevealObserver } from "@/components/Reveal";
 import { buildFaucetAction, sendWalletTx } from "@/lib/execution";
 import type { ApiQuote, ApiRoute, DeploymentMap } from "@/lib/types";
@@ -25,7 +25,7 @@ const CHAIN_OPTIONS = [
 const TOKEN_OPTIONS = ["mUSDC", "mPOT"];
 
 export default function Home() {
-  const { address, isConnected } = useWallet();
+  const { address, isConnected, connect } = useWallet();
 
   const [fromChain, setFromChain] = useState("11155111");
   const [fromToken, setFromToken] = useState("mUSDC");
@@ -114,14 +114,13 @@ export default function Home() {
         </a>
         <div className="wh-right">
           <a className="wh-link" href="#swap">Swap</a>
-          <a className="wh-link" href="#access">Agents</a>
-          <a className="wh-link" href="#highlights">Venues</a>
-          <a className="wh-link" href="/docs">API</a>
           <a className="wh-link" href="#faq">FAQs</a>
           <ConnectButton />
         </div>
       </header>
 
+      {!isConnected && (
+        <>
       <section className="hero">
         <div className="hero-inner">
           <div className="hero-copy">
@@ -136,14 +135,13 @@ export default function Home() {
               and EVM chains.
             </p>
             <div className="hero-actions blur-in d2">
-              <button className="btn btn-green" onClick={getRoutes} disabled={loading}>
-                {loading ? "Routing…" : "Find best route"}
+              <button className="btn btn-green" onClick={() => connect()}>
+                Connect wallet
               </button>
-              <button className="btn btn-outline" onClick={faucet} disabled={!isConnected}>
-                Get test tokens
-              </button>
+              <a className="btn btn-outline" href="/docs">
+                Read the docs
+              </a>
             </div>
-            {faucetState && <p className="footer-note">{faucetState}</p>}
           </div>
 
           <HeroDevice />
@@ -157,14 +155,35 @@ export default function Home() {
             <PortaldotMark size={15} />
             <span>Portaldot V3</span>
           </span>
-          <span className="venue">Ethereum Sepolia</span>
+          <span className="venue">
+            <EthereumMark size={13} />
+            <span>Ethereum Sepolia</span>
+          </span>
           <span className="venue">MiniAMM 30 bps</span>
           <span className="venue">MiniAMM 10 bps</span>
           <span className="venue">Hypersep Bridge</span>
         </div>
       </div>
+        </>
+      )}
 
+      {isConnected && (
       <section className="wrap" id="swap">
+        <div className="dashboard-head">
+          <div>
+            <p className="label">Dashboard</p>
+            <h1>Trade across chains</h1>
+            <p className="sub">
+              {address ? `${address.slice(0, 6)}…${address.slice(-4)}` : "Wallet connected"}. One
+              quote, every venue, ranked by total cost.
+            </p>
+          </div>
+          <button className="chip-btn" onClick={faucet}>
+            Get test tokens
+          </button>
+        </div>
+        {faucetState && <p className="footer-note">{faucetState}</p>}
+        <div className="dashboard-grid">
         <div className="swap-card" ref={swapRef}>
           <div className="panel-head">
             <h2>Find a route</h2>
@@ -223,7 +242,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div style={{ maxWidth: 600, margin: "0 auto" }}>
+        <div className="dashboard-results">
           {error && <p className="warning">{error}</p>}
           {quote?.warnings.map((w) => (
             <p key={w} className="warning">{w}</p>
@@ -245,12 +264,6 @@ export default function Home() {
                 />
               ))}
               <p className="footer-note">Price source: {quote.priceSource}</p>
-              {quote.demo && (
-                <p className="warning">
-                  Demo mode: contracts are not deployed yet, so these routes use seeded liquidity.
-                  Run the deploy script to quote and execute against real testnet pools.
-                </p>
-              )}
             </>
           )}
 
@@ -269,8 +282,12 @@ export default function Home() {
             <p className="warning" style={{ marginTop: 20 }}>Connect your wallet to execute this route.</p>
           )}
         </div>
+        </div>
       </section>
+      )}
 
+      {!isConnected && (
+        <>
       <section className="light" id="highlights">
         <div className="light-inner reveal">
           <h2>Routing that reads the whole market, not one pool</h2>
@@ -347,11 +364,13 @@ export default function Home() {
           <span>It ranks complete routes, not single pools. Bridge cost, swap fees, slippage and ETA are compared before you sign.</span>
         </div>
       </section>
+        </>
+      )}
 
       <footer className="footer">
         <span>Hypersep - Cross-chain liquidity aggregator - Testnet prototype</span>
         <span>
-          <a href="#swap">Swap</a> · <a href="#highlights">Venues</a> · <a href="#api">API</a> · <a href="#faq">FAQs</a>
+          <a href="#swap">Swap</a> · <a href="#faq">FAQs</a>
         </span>
       </footer>
     </>

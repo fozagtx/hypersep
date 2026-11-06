@@ -35,21 +35,30 @@ export function HypersepMark({ size = 22 }: { size?: number }) {
 
 export function PortaldotMark({ size = 16 }: { size?: number }) {
   return (
+    <img
+      src="/assets/portaldot.png"
+      width={size}
+      height={size}
+      alt=""
+      aria-hidden="true"
+      className="chain-mark"
+      style={{ borderRadius: 4, objectFit: "contain" }}
+    />
+  );
+}
+
+export function EthereumMark({ size = 16 }: { size?: number }) {
+  return (
     <svg
       width={size}
       height={size}
       viewBox="0 0 24 24"
-      fill="none"
+      fill="currentColor"
       aria-hidden="true"
       className="chain-mark"
     >
-      <path
-        d="M12 2.6 20.2 7v10L12 21.4 3.8 17V7L12 2.6Z"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinejoin="round"
-      />
-      <circle cx="12" cy="12" r="2.6" fill="currentColor" opacity="0.55" />
+      <path d="M12 2 5 12.1l7 4.1 7-4.1L12 2Z" opacity="0.95" />
+      <path d="m12 22 7-8.1-7 4.1-7-4.1L12 22Z" opacity="0.55" />
     </svg>
   );
 }

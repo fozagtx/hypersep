@@ -18,7 +18,71 @@ A user holding USDC on Ethereum who wants POT on Portaldot must pick a bridge, p
 
 Hypersep queries every liquidity venue it knows (AMM pools on each chain plus bridge paths between chains) and returns **ranked routes with a full cost breakdown**: output amount, fees, gas, price impact, and estimated settlement time. The user sees the trade-offs and picks; the protocol handles the path.
 
-The same engine is exposed two ways: a swap UI in the app and an MCP server at `POST /api/mcp` for agents such as Claude Code and ChatGPT.
+The same engine is exposed two ways: a swap dashboard in the app and an MCP server at `POST /api/mcp` for agents such as Claude Code and ChatGPT.
+
+## AI and agents
+
+Hypersep is AI-first because the route engine is the product and the app is only one client of it. An agent is the other client, and it uses the same quote engine over MCP instead of scraping a UI.
+
+What the agent actually does:
+
+1. The user asks in plain language, for example: "Cheapest route for 100 mUSDC on Sepolia into mPOT on Portaldot?"
+2. The agent reads the MCP tool list and calls `hypersep_quote` with the two chains, two tokens, and amount.
+3. The engine quotes every venue and bridge path, scores them on output, fees, gas, price impact, time, and risk, and returns the top three routes.
+4. The agent compares the routes, explains the trade-offs, and names the best path. No custom prompt engineering is needed, the tool output is already structured.
+5. Execution stays with the user. The wallet signs the prepared transactions. The agent never holds a private key.
+
+```
+User -> Claude / ChatGPT -> MCP POST /api/mcp -> quote engine -> AMM + bridge venues
+```
+
+A tool call looks like this:
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 2,
+  "method": "tools/call",
+  "params": {
+    "name": "hypersep_quote",
+    "arguments": {
+      "fromChain": "11155111",
+      "fromToken": "mUSDC",
+      "toChain": "420420777",
+      "toToken": "mPOT",
+      "amountIn": 100
+    }
+  }
+}
+```
+
+The response is the same ranked route set the dashboard uses: labels (`Best overall`, `Cheapest`, `Fastest`), output amount, fees, gas, price impact, ETA, and the ordered venues.
+
+The public tools are read-only and need no API key, OAuth, or database: `hypersep_quote`, `hypersep_deployments`, `hypersep_status`.
+
+## Connect Claude
+
+1. Copy your Hypersep MCP URL, for example `https://your-domain/api/mcp`.
+2. Add it once:
+
+```bash
+claude mcp add --transport http hypersep https://your-domain/api/mcp
+```
+
+3. Ask: "Use hypersep_quote for 100 mUSDC on Sepolia into mPOT on Portaldot."
+
+That is the whole setup. Same for ChatGPT, Codex, or any MCP client. The endpoint is `POST /api/mcp` with JSON-RPC 2.0, and `GET /api/mcp` is the discovery document.
+
+```json
+{
+  "mcpServers": {
+    "hypersep": {
+      "type": "http",
+      "url": "https://your-domain/api/mcp"
+    }
+  }
+}
+```
 
 ## Architecture
 
@@ -65,7 +129,7 @@ It returns the top 3 with labels: **Best overall / Cheapest / Fastest**.
 ```
 hypersep/
 ├── app/                        # Next.js 15 App Router
-│   ├── page.tsx                # swap UI, route cards, execution timeline
+│   ├── page.tsx                # landing page, wallet connect opens the dashboard
 │   ├── docs/page.tsx           # public API docs
 │   └── api/
 │       ├── quote/route.ts      # GET /api/quote
@@ -157,7 +221,7 @@ Other endpoints:
 | `GET /api/mcp` | MCP discovery document |
 | `POST /api/mcp` | JSON-RPC 2.0: `initialize`, `tools/list`, `tools/call`, `ping` |
 
-MCP tools: `hypersep_quote`, `hypersep_deployments`, `hypersep_status`.
+MCP tools: `hypersep_quote`, `hypersep_deployments`, `hypersep_status`. They are read-only today; execution planning is the next tool.
 
 ```bash
 claude mcp add --transport http hypersep http://localhost:3000/api/mcp

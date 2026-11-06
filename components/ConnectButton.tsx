@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useWallet } from "@/hooks/useWallet";
 import { CHAINS_BY_ID } from "@/lib/chains";
+import { EthereumMark, PortaldotMark } from "@/components/logos";
 
 export function ConnectButton() {
   const { address, isConnected, chainId, connect, disconnect, switchChain } = useWallet();
@@ -45,7 +46,9 @@ export function ConnectButton() {
           key={c.id}
           className={`chip-btn${c.id === chainId ? " on" : ""}`}
           onClick={() => switchChain(c.id)}
+          style={{ display: "inline-flex", alignItems: "center", gap: 6 }}
         >
+          {c.id === 11155111 ? <EthereumMark size={11} /> : <PortaldotMark size={11} />}
           {c.name.replace("Ethereum ", "").replace(" V3 Testnet", "")}
         </button>
       ))}
