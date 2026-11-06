@@ -1171,3 +1171,127 @@ input { width: 130px; }
 @media (max-width: 620px) {
   .cell-flow { grid-column: span 1; min-height: 300px; }
 }
+
+/* --------------------------------------------------- dashboard swap card */
+.dashboard-grid .swap-card {
+  background:
+    radial-gradient(120% 100% at 15% 0%, #262626 0%, #151515 55%, #0d0d0d 100%);
+  border-color: rgba(255, 255, 255, 0.08);
+  color: var(--paper);
+}
+.dashboard-grid .swap-card .panel-head h2 { color: var(--paper); }
+.dashboard-grid .swap-card .tag {
+  color: rgba(255, 255, 255, 0.58);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+.dashboard-grid .swap-card .label { color: rgba(255, 255, 255, 0.62); }
+.dashboard-grid .swap-card .leg {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+.dashboard-grid .swap-card select,
+.dashboard-grid .swap-card input {
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--paper);
+  border-color: rgba(255, 255, 255, 0.16);
+}
+.dashboard-grid .swap-card select:focus,
+.dashboard-grid .swap-card input:focus {
+  border-color: rgba(255, 255, 255, 0.62);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.08);
+}
+.dashboard-grid .swap-card .leg-divider { color: rgba(255, 255, 255, 0.5); }
+.dashboard-grid .swap-card .leg-divider::before,
+.dashboard-grid .swap-card .leg-divider::after {
+  background: rgba(255, 255, 255, 0.12);
+}
+.dashboard-grid .swap-card .leg-arrow {
+  background: var(--paper);
+  color: var(--ink);
+  border-color: transparent;
+  box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.04);
+}
+.dashboard-grid .swap-card .btn-white {
+  background: var(--paper);
+  color: var(--ink);
+  border-color: var(--paper);
+}
+.dashboard-grid .swap-card .btn-white:hover:not(:disabled) { background: #ffffff; }
+
+/* paper half inside the ink card */
+.dashboard-grid .swap-card .leg-receive {
+  background: var(--paper);
+  color: var(--ink);
+  border-color: transparent;
+}
+.dashboard-grid .swap-card .leg-receive .label { color: var(--ink-3); }
+.dashboard-grid .swap-card .leg-receive select,
+.dashboard-grid .swap-card .leg-receive input {
+  background: var(--canvas);
+  color: var(--ink);
+  border-color: var(--hair);
+}
+.dashboard-grid .swap-card .leg-receive .btn-white {
+  background: var(--ink);
+  color: var(--paper);
+  border-color: var(--ink);
+}
+
+/* ------------------------------------------------------------- contracts */
+.contracts-panel {
+  max-width: 1040px;
+  margin: 18px auto 0;
+  padding: 20px 22px;
+  background: var(--canvas);
+  border: 1px solid var(--hair-soft);
+  border-radius: var(--radius);
+  box-shadow: var(--sheet);
+}
+.contracts-panel .panel-head { margin-bottom: 12px; }
+.contract-empty > p {
+  color: var(--ink-2);
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+.contract-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.contract-card {
+  min-width: 0;
+  padding: 12px 14px;
+  background: var(--wash);
+  border: 1px solid var(--hair-soft);
+  border-radius: 12px;
+}
+.contract-card .k {
+  margin-bottom: 6px;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.contract-card code {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--ink);
+  word-break: break-all;
+}
+.contract-note { margin-top: 12px; color: var(--ink-3); font-size: 12px; }
+.contract-note code { font-family: var(--font-mono); }
+.contract-chain + .contract-chain { margin-top: 16px; }
+.contract-chain-head {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+@media (max-width: 640px) {
+  .contract-grid { grid-template-columns: 1fr; }
+}
