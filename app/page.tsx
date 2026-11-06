@@ -88,9 +88,10 @@ export default function Home() {
 
           <div className="agents-strip">
             <div className="agent-logos">
-              <span><ClaudeMark size={18} /> Claude</span>
+              <span><ClaudeMark size={18} /> Claude Code</span>
               <span><OpenAIMark size={18} /> ChatGPT</span>
               <span>Codex</span>
+              <span>Cursor</span>
             </div>
             <McpEndpoint />
             <a className="btn btn-outline btn-sm" href="/docs">Agent setup</a>

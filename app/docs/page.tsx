@@ -20,9 +20,10 @@ export default function DocsPage() {
       <McpEndpoint />
 
       <div className="agent-logos">
-        <span><ClaudeMark size={18} /> Claude</span>
+        <span><ClaudeMark size={18} /> Claude Code</span>
         <span><OpenAIMark size={18} /> ChatGPT</span>
         <span>Codex</span>
+        <span>Cursor</span>
       </div>
 
       <ol className="agent-steps">

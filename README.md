@@ -60,7 +60,9 @@ The response is the same ranked route set the dashboard uses: labels (`Best over
 
 The public tools are read-only and need no API key, OAuth, or database: `hypersep_quote`, `hypersep_deployments`, `hypersep_status`.
 
-## Connect Claude
+## Connect an agent
+
+The MCP server works with any MCP client: Claude Code, Codex, Cursor, ChatGPT, or your own agent. No SDK, no plugin, no per-agent integration.
 
 1. Copy your Hypersep MCP URL, for example `https://your-domain/api/mcp`.
 2. Add it once:
@@ -71,7 +73,7 @@ claude mcp add --transport http hypersep https://your-domain/api/mcp
 
 3. Ask: "Use hypersep_quote for 100 mUSDC on Sepolia into mPOT on Portaldot."
 
-That is the whole setup. Same for ChatGPT, Codex, or any MCP client. The endpoint is `POST /api/mcp` with JSON-RPC 2.0, and `GET /api/mcp` is the discovery document.
+That is the whole setup. The endpoint is `POST /api/mcp` with JSON-RPC 2.0, and `GET /api/mcp` is the discovery document. One server covers Claude Code, Codex, Cursor, ChatGPT, and any other MCP client.
 
 ```json
 {
